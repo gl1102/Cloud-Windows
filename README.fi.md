@@ -12,7 +12,7 @@ Muuta ilmainen GitHub Actions -Windows-virtuaalikone pilvityöpöydäksi, jota v
 - ⌨️ Sisäänrakennettu kiinalainen Sogou Pinyin -syöttötapa, kiinalainen syöttö toimii heti (`Win + Space` vaihtaa kiinan ja englannin välillä)
 - 🖱️ Yhdistä puhelimesta, tabletilta tai tietokoneelta
 - ⏱️ Jokainen ajo kestää jopa ~6 tuntia, ja voit peruuttaa milloin tahansa
-- 📦 **RustDesk-versio**: tarjolla on myös RustDesk-työnkulku, joka lataa automaattisesti uusimman RustDeskin D-asemaan ja asentaa sen äänettömästi kohteeseen `D:\RustDesk`
+- 📦 **RustDesk-versio**: tarjolla on myös RustDesk-työnkulku, joka lataa automaattisesti uusimman RustDesk-asennusohjelman työpöydälle
 
 ## 🚀 Käyttö (toimii heti forkkauksen jälkeen)
 
@@ -27,7 +27,7 @@ Napsauta sivun oikeassa yläkulmassa olevaa **Fork**-painiketta kopioidaksesi pr
 1. Mene forkkaamasi repositorion sivulle ja napsauta ylhäällä **Actions**-välilehteä
 2. Valitse vasemmalta työnkulku (valitse yksi):
    - **Windows Cloud Desktop**: vakio-pilvityöpöytä
-   - **Windows Cloud Desktop + RustDesk**: vakioversio sekä uusimman RustDeskin automaattinen lataus D-asemaan äänettömällä asennuksella kohteeseen `D:\RustDesk` (versiota ei ole kovakoodattu — hakee aina uusimman virallisen julkaisun)
+   - **Windows Cloud Desktop + RustDesk**: vakioversio sekä uusimman RustDesk-asennusohjelman automaattinen lataus työpöydälle (versiota ei ole kovakoodattu — hakee aina uusimman virallisen julkaisun); kaksoisnapsauta asentaaksesi, kun tarvitset etäohjausta
 3. Napsauta oikealla **Run workflow** -painiketta — avautuu valintaikkuna, jossa on kolme syöttökenttää:
 
 | Parametri | Kuvaus |
