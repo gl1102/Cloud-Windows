@@ -12,6 +12,7 @@ Turn a free GitHub Actions Windows VM into a cloud desktop you can access from y
 - ⌨️ Built-in Sogou Pinyin IME, Chinese input works out of the box (press `Win + Space` to switch between Chinese and English)
 - 🖱️ Connect from your phone, tablet, or computer
 - ⏱️ Each run lasts up to ~6 hours, and you can cancel anytime
+- 📦 **RustDesk edition**: there's also a RustDesk workflow that automatically downloads the latest RustDesk installer to the Desktop
 
 ## 🚀 Usage (works right after forking)
 
@@ -24,7 +25,9 @@ Click the **Fork** button in the top-right corner of this page to copy the proje
 ### Step 2: Launch the cloud desktop
 
 1. Go to your forked repo's page and click the **Actions** tab at the top
-2. Find **Windows Cloud Desktop** on the left and click it
+2. Choose a workflow on the left (pick one):
+   - **Windows Cloud Desktop**: the standard cloud desktop
+   - **Windows Cloud Desktop + RustDesk**: standard edition plus automatic download of the latest RustDesk installer to the Desktop (version not hardcoded — always fetches the latest official release)
 3. Click the **Run workflow** button on the right — a dialog with three inputs pops up:
 
 | Parameter | Description |
@@ -82,4 +85,4 @@ https://xxx-xxx-xxx.trycloudflare.com/vnc.html
 
 ## 🛠️ Want to tweak it yourself?
 
-The workflow file lives at `.github/workflows/windows-vnc.yml` — you can edit it right on the GitHub website; changes take effect after you commit.
+The workflow files live under `.github/workflows/` (`windows-vnc.yml` for the standard edition, `windows-vnc-rustdesk.yml` for the RustDesk edition) — you can edit them right on the GitHub website; changes take effect after you commit.
