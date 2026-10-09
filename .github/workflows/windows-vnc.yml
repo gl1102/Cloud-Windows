@@ -90,7 +90,7 @@ jobs:
           # Install cloudflared via choco (preinstalled on the runner)
           choco install cloudflared -y --no-progress
           $cf = "$env:ProgramData\chocolatey\bin\cloudflared.exe"
-          Start-Process $cf -ArgumentList @("tunnel", "--url", "http://127.0.0.1:6080", "--no-autoupdate") -RedirectStandardOutput "$env:TEMP\tunnel.log" -RedirectStandardError "$env:TEMP\tunnel.err"
+          $cfProc = Start-Process $cf -ArgumentList @("tunnel", "--url", "http://127.0.0.1:6080", "--no-autoupdate") -PassThru -RedirectStandardOutput "$env:TEMP\tunnel.log" -RedirectStandardError "$env:TEMP\tunnel.err"
           Write-Host "Waiting for tunnel URL..."
           $tunnelUrl = ""
           for ($i = 0; $i -lt 60; $i++) {
@@ -98,6 +98,12 @@ jobs:
             if ($m) { $tunnelUrl = $m.Matches[0].Value; break }
             Start-Sleep -Seconds 2
           }
+          # Diagnose: is cloudflared alive? does local websockify answer HTTP?
+          if ($cfProc.HasExited) { Write-Host "WARNING: cloudflared already exited, code $($cfProc.ExitCode)" } else { Write-Host "cloudflared running (pid $($cfProc.Id))" }
+          try {
+            $resp = Invoke-WebRequest -Uri "http://127.0.0.1:6080/vnc.html" -UseBasicParsing -TimeoutSec 10
+            Write-Host "Local websockify HTTP check: $($resp.StatusCode)"
+          } catch { Write-Host "WARNING: local websockify HTTP check failed: $($_.Exception.Message)" }
           Write-Host ""
           Write-Host "=================================================="
           Write-Host "  Open in browser: $tunnelUrl/vnc.html"
@@ -106,4 +112,10 @@ jobs:
           Write-Host ""
           $mins = [int]"${{ inputs.run_minutes }}"
           Write-Host "Keeping alive for $mins minutes (Cancel anytime in the Actions page)"
-          Start-Sleep -Seconds ($mins * 60)
+          $end = (Get-Date).AddMinutes($mins)
+          while ((Get-Date) -lt $end) {
+            Start-Sleep -Seconds 60
+            if ($cfProc.HasExited) { Write-Host "WARNING: cloudflared died, exit code $($cfProc.ExitCode). The tunnel URL above no longer works."; break }
+            try { $c = New-Object Net.Sockets.TcpClient; $c.Connect("127.0.0.1", 6080); $c.Close() }
+            catch { Write-Host "WARNING: nothing listening on 6080 anymore (websockify died)."; break }
+          }
