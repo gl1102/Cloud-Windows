@@ -1,23 +1,22 @@
-# 免费 Windows 云桌面（RustDesk 版）- GitHub Actions workflow
+# 免费 Windows 云桌面（网页版 VNC）- GitHub Actions workflow
 # 说明：GitHub 不提供 Windows 10 的 runner，这里开的是 Windows Server，
 #       桌面体验和 Win10 几乎一样，配置 4 核 16G。
-#       走 RustDesk 官方中继服务器，手机/电脑装 RustDesk 客户端直连，
-#       比网页 VNC 流畅，不用开浏览器。
 # 用法：
-# 1. 把本文件放到 .github/workflows/windows-rustdesk.yml（必须在 main 分支）
-# 2. 仓库页面 Actions -> "Windows RustDesk Desktop" -> Run workflow，
-#    填连接密码（用完即弃，别用常用密码） -> Run
-# 3. 等 3~5 分钟，在这次运行的日志里找到 RustDesk ID（一串数字）
-# 4. 手机/电脑安装 RustDesk 客户端，输入 ID 和你设置的密码，点连接
+# 1. 把本文件放到 .github/workflows/windows-vnc.yml（必须在 main 分支）
+# 2. 仓库页面 Actions -> "Windows Cloud Desktop" -> Run workflow，
+#    填 VNC 密码（最多8位有效，用完即弃，别用常用密码） -> Run
+# 3. 等 4~6 分钟（要下载安装 TightVNC），在这次运行的日志里找到
+#    https://xxx.trycloudflare.com/vnc.html，浏览器打开
+# 4. 点 Connect，输入 VNC 密码，就能用了
 # 5. 不用时去 Actions 页面 Cancel 这次运行（单次最长 6 小时，到时自动结束）
 
-name: Windows RustDesk Desktop
+name: Windows Cloud Desktop
 
 on:
   workflow_dispatch:
     inputs:
-      rd_password:
-        description: 'RustDesk 连接密码（用完即弃，别用常用密码）'
+      vnc_password:
+        description: 'VNC 连接密码（最多8位有效，用完即弃，别用常用密码）'
         required: true
       run_minutes:
         description: '本次运行时长（分钟，最多填 350）'
@@ -29,39 +28,63 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 360  # GitHub 单个 job 上限 6 小时
     steps:
-      - name: 下载并启动 RustDesk
+      - name: 安装 TightVNC 服务端（含 VNC 密码）
         shell: powershell
         run: |
-          # 从 GitHub API 取最新版下载地址（免硬编码版本号）
-          $rel = Invoke-RestMethod -Uri "https://api.github.com/repos/rustdesk/rustdesk/releases/latest"
-          $asset = $rel.assets | Where-Object { $_.name -like "rustdesk-*-x86_64.exe" -and $_.name -notlike "*sciter*" } | Select-Object -First 1
-          Write-Host "下载 $($asset.name) ..."
-          $rd = "$env:TEMP\rustdesk.exe"
-          Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $rd
-          # 先启动主程序（后台），再设密码、取 ID
-          Start-Process -FilePath $rd
-          Start-Sleep -Seconds 15
-          & $rd --password "${{ inputs.rd_password }}"
-          Start-Sleep -Seconds 5
-          # 等 ID 注册完成（最多约 2 分钟）
-          $rdId = ""
+          $msi = "$env:TEMP\tightvnc.msi"
+          Invoke-WebRequest -Uri "https://www.tightvnc.com/download/2.8.90/tightvnc-2.8.90-gpl-setup-64bit.msi" -OutFile $msi
+          $vncPass = "${{ inputs.vnc_password }}"
+          $msiArgs = @("/i", $msi, "/quiet", "/norestart", "ADDLOCAL=Server",
+                    "SET_USEVNCAUTHENTICATION=1", "VALUE_OF_USEVNCAUTHENTICATION=1",
+                    "SET_PASSWORD=1", "VALUE_OF_PASSWORD=$vncPass")
+          $p = Start-Process msiexec -ArgumentList $msiArgs -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "TightVNC 安装失败，退出码 $($p.ExitCode)" }
+          # 确认密码真的写进去了，没写进去就直接报错停掉，不让桌面裸奔
+          $reg = Get-ItemProperty -Path "HKLM:\SOFTWARE\TightVNC\Server" -Name "Password" -ErrorAction SilentlyContinue
+          if (-not $reg) { throw "VNC 密码未设置成功，已停止以避免无密码暴露" }
+          Write-Host "TightVNC 安装完成，密码已设置"
+
+      - name: 启动 VNC 并准备 noVNC 网页端
+        shell: powershell
+        run: |
+          # 以应用模式启动（捕获当前会话桌面；不注册成服务，避开 session 0 隔离）
+          Start-Process -FilePath "C:\Program Files\TightVNC\tvnserver.exe"
+          # 等 5900 端口就绪
+          $ok = $false
+          for ($i = 0; $i -lt 30; $i++) {
+            try { $c = New-Object Net.Sockets.TcpClient; $c.Connect("127.0.0.1", 5900); $c.Close(); $ok = $true; break }
+            catch { Start-Sleep -Seconds 2 }
+          }
+          if (-not $ok) { throw "VNC 5900 端口未就绪" }
+          Write-Host "VNC 服务已就绪"
+          git clone -q --depth 1 https://github.com/novnc/noVNC.git "$env:TEMP\noVNC"
+          python -m pip install -q websockify
+          $wsArgs = @("-m", "websockify", "--web=$env:TEMP\noVNC", "6080", "127.0.0.1:5900")
+          Start-Process python -ArgumentList $wsArgs -RedirectStandardOutput "$env:TEMP\websockify.log" -RedirectStandardError "$env:TEMP\websockify.err"
+          Start-Sleep -Seconds 3
+          Write-Host "noVNC 网页端已就绪"
+
+      - name: 建立公网隧道（在下方日志里找访问地址）
+        shell: powershell
+        run: |
+          # 用 choco 装 cloudflared（runner 自带 choco）
+          choco install cloudflared -y --no-progress
+          $cf = "$env:ProgramData\chocolatey\bin\cloudflared.exe"
+          Start-Process $cf -ArgumentList @("tunnel", "--url", "http://127.0.0.1:6080", "--no-autoupdate") -RedirectStandardOutput "$env:TEMP\tunnel.log" -RedirectStandardError "$env:TEMP\tunnel.err"
+          Write-Host "等待隧道地址生成..."
+          $tunnelUrl = ""
           for ($i = 0; $i -lt 60; $i++) {
-            $rdId = (& $rd --get-id 2>$null | Out-String).Trim()
-            if ($rdId -match '^\d[\d ]*$') { break }
+            $m = Select-String -Path "$env:TEMP\tunnel.log", "$env:TEMP\tunnel.err" -Pattern 'https://[a-zA-Z0-9.-]+\.trycloudflare\.com' -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($m) { $tunnelUrl = $m.Matches[0].Value; break }
             Start-Sleep -Seconds 2
           }
-          if ($rdId -notmatch '^\d') { throw "未能获取到 RustDesk ID，请看上方日志排查" }
           Write-Host ""
           Write-Host "=================================================="
-          Write-Host "  RustDesk ID : $rdId"
-          Write-Host "  密码        : 你刚才在 Run workflow 时填的那个"
-          Write-Host "  手机/电脑装 RustDesk 客户端，填入上面两项即可连接"
+          Write-Host "  浏览器访问地址： $tunnelUrl/vnc.html"
+          Write-Host "  打开后点 Connect，输入你设置的 VNC 密码"
+          Write-Host "  手机上建议点开后用双指缩放，体验好很多"
           Write-Host "=================================================="
           Write-Host ""
-
-      - name: 保持运行
-        shell: powershell
-        run: |
           $mins = [int]"${{ inputs.run_minutes }}"
           Write-Host "保持运行 $mins 分钟（也可在 Actions 页面随时 Cancel 结束）"
           Start-Sleep -Seconds ($mins * 60)
