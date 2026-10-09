@@ -60,10 +60,21 @@ jobs:
           }
           if (-not $ok) { throw "VNC port 5900 not ready" }
           Write-Host "VNC server ready"
-          git clone -q --depth 1 https://github.com/novnc/noVNC.git "$env:TEMP\noVNC"
+          $noVNC = "$env:TEMP\noVNC"
+          if (-not (Test-Path "$noVNC\vnc.html")) {
+            if (Test-Path $noVNC) { Remove-Item -Recurse -Force $noVNC }
+            git clone -q --depth 1 https://github.com/novnc/noVNC.git $noVNC
+          }
+          if (-not (Test-Path "$noVNC\vnc.html")) { throw "noVNC download failed" }
           python -m pip install -q websockify
-          $wsArgs = @("-m", "websockify", "--web=$env:TEMP\noVNC", "6080", "127.0.0.1:5900")
-          Start-Process python -ArgumentList $wsArgs -RedirectStandardOutput "$env:TEMP\websockify.log" -RedirectStandardError "$env:TEMP\websockify.err"
+          if ($LASTEXITCODE -ne 0) { throw "pip install websockify failed" }
+          $wsArgs = @("-m", "websockify", "--web=$noVNC", "6080", "127.0.0.1:5900")
+          $ws = Start-Process python -ArgumentList $wsArgs -PassThru -RedirectStandardOutput "$env:TEMP\websockify.log" -RedirectStandardError "$env:TEMP\websockify.err"
+          Start-Sleep -Seconds 4
+          if ($ws.HasExited) {
+            $wsErr = Get-Content "$env:TEMP\websockify.err" -Raw -ErrorAction SilentlyContinue
+            throw "websockify failed to start: $wsErr"
+          }
           # Wait for port 6080 (websockify must be up, otherwise the web page won't load)
           $wsOk = $false
           for ($i = 0; $i -lt 15; $i++) {
