@@ -12,7 +12,7 @@ Przekształć darmową maszynę wirtualną Windows z GitHub Actions w pulpit chm
 - ⌨️ Wbudowany edytor IME Sogou Pinyin, wprowadzanie chińskich znaków działa od razu (naciśnij `Win + Space`, aby przełączać się między chińskim a angielskim)
 - 🖱️ Połącz się z telefonu, tabletu lub komputera
 - ⏱️ Każde uruchomienie trwa do ~6 godzin i możesz je anulować w dowolnym momencie
-- 📦 **Wersja RustDesk**: dostępny jest też przepływ pracy RustDesk, który automatycznie pobiera najnowszą wersję RustDesk na dysk D i instaluje ją po cichu w `D:\RustDesk`
+- 📦 **Wersja RustDesk**: dostępny jest też przepływ pracy RustDesk, który automatycznie pobiera najnowszy instalator RustDesk na Pulpit
 
 ## 🚀 Użycie (działa od razu po sforkowania)
 
@@ -27,7 +27,7 @@ Kliknij przycisk **Fork** w prawym górnym rogu tej strony, aby skopiować proje
 1. Przejdź do strony swojego sforknowanego repozytorium i kliknij zakładkę **Actions** u góry
 2. Wybierz przepływ pracy po lewej (wybierz jeden):
    - **Windows Cloud Desktop**: standardowy pulpit chmurowy
-   - **Windows Cloud Desktop + RustDesk**: edycja standardowa plus automatyczne pobieranie najnowszej wersji RustDesk na dysk D z cichą instalacją w `D:\RustDesk` (wersja nie jest wpisana na sztywno — zawsze pobiera najnowsze oficjalne wydanie)
+   - **Windows Cloud Desktop + RustDesk**: edycja standardowa plus automatyczne pobieranie najnowszego instalatora RustDesk na Pulpit (wersja nie jest wpisana na sztywno — zawsze pobiera najnowsze oficjalne wydanie); gdy potrzebujesz zdalnego sterowania, wystarczy kliknąć dwukrotnie, aby zainstalować
 3. Kliknij przycisk **Run workflow** po prawej — wyskoczy okno dialogowe z trzema polami wejściowymi:
 
 | Parametr | Opis |
