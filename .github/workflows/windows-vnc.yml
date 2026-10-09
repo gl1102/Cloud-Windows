@@ -25,6 +25,15 @@ on:
         description: '本次运行时长（分钟，最多填 350）'
         required: false
         default: '300'
+      resolution:
+        description: '桌面分辨率'
+        required: false
+        default: '1920x1080'
+        type: choice
+        options:
+          - 1920x1080
+          - 1600x900
+          - 1366x768
 
 jobs:
   desktop:
@@ -89,6 +98,17 @@ jobs:
           # Minimize this console window (the runner agent window cannot be closed)
           Add-Type 'using System; using System.Runtime.InteropServices; public static class W { [DllImport("kernel32.dll")] public static extern IntPtr GetConsoleWindow(); [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow); }'
           [W]::ShowWindow([W]::GetConsoleWindow(), 6) | Out-Null
+          # Set desktop resolution via Win32 API (default 1920x1080, selectable at Run)
+          $resParts = "${{ inputs.resolution }}".Split("x")
+          $resW = [int]$resParts[0]; $resH = [int]$resParts[1]
+          Add-Type 'using System; using System.Runtime.InteropServices; public class Dpy { [DllImport("user32.dll")] public static extern int ChangeDisplaySettings(ref DEVMODE dm, int flags); [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi)] public struct DEVMODE { [MarshalAs(UnmanagedType.ByValTStr, SizeConst=32)] public string dmDeviceName; public short dmSpecVersion; public short dmDriverVersion; public short dmSize; public short dmDriverExtra; public int dmFields; public int dmPositionX; public int dmPositionY; public int dmDisplayOrientation; public int dmDisplayFixedOutput; public short dmColor; public short dmDuplex; public short dmYResolution; public short dmTTOption; public short dmCollate; [MarshalAs(UnmanagedType.ByValTStr, SizeConst=32)] public string dmFormName; public short dmLogPixels; public int dmBitsPerPel; public int dmPelsWidth; public int dmPelsHeight; public int dmDisplayFlags; public int dmDisplayFrequency; public int dmICMMethod; public int dmICMIntent; public int dmMediaType; public int dmDitherType; public int dmReserved1; public int dmReserved2; public int dmPanningWidth; public int dmPanningHeight; } }'
+          $dm = New-Object Dpy+DEVMODE
+          $dm.dmSize = [Runtime.InteropServices.Marshal]::SizeOf($dm)
+          $dm.dmPelsWidth = $resW; $dm.dmPelsHeight = $resH
+          $dm.dmFields = 0x80000 -bor 0x100000
+          $cdsResult = [Dpy]::ChangeDisplaySettings([ref]$dm, 0)
+          if ($cdsResult -eq 0) { Write-Host "Resolution set to ${resW}x${resH}" } else { Write-Host "WARNING: ChangeDisplaySettings returned $cdsResult, keeping default resolution" }
+          Start-Sleep -Seconds 2
           # All long-running services start in THIS step: background processes
           # started with Start-Process do not reliably survive across steps.
           $noVNC = "$env:TEMP\noVNC"
