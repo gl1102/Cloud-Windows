@@ -12,7 +12,7 @@ Convierte una máquina virtual Windows gratuita de GitHub Actions en un escritor
 - ⌨️ Método de entrada Sogou (搜狗输入法, Sogou Pinyin) integrado, chino listo para usar desde el primer momento (cambia entre chino e inglés con `Win + Space`)
 - 🖱️ Conéctate desde el móvil, la tableta o el ordenador
 - ⏱️ Cada ejecución dura hasta ~6 horas y puedes cancelarla cuando quieras
-- 📦 **Edición RustDesk**: también hay un workflow con RustDesk que descarga automáticamente el RustDesk más reciente en la unidad D y lo instala de forma silenciosa en `D:\RustDesk`
+- 📦 **Edición RustDesk**: también hay un workflow con RustDesk que descarga automáticamente el instalador del RustDesk más reciente en el Desktop
 
 ## 🚀 Cómo usarlo (funciona nada más hacer fork)
 
@@ -27,7 +27,7 @@ Haz clic en el botón **Fork** arriba a la derecha de esta página para copiar e
 1. Entra en la página del repositorio que forkeaste y haz clic en la pestaña **Actions** de arriba
 2. A la izquierda elige un workflow (uno de los dos):
    - **Windows Cloud Desktop**: el escritorio en la nube estándar
-   - **Windows Cloud Desktop + RustDesk**: la edición estándar más la descarga automática del RustDesk más reciente en la unidad D con instalación silenciosa en `D:\RustDesk` (la versión no está fijada en el código: siempre se obtiene la última release oficial)
+  - **Windows Cloud Desktop + RustDesk**: la edición estándar más la descarga automática del instalador del RustDesk más reciente en el Desktop (la versión no está fijada en el código: siempre se obtiene la última release oficial); haz doble clic para instalarlo cuando necesites control remoto
 3. Haz clic en el botón **Run workflow** de la derecha: se abre un diálogo con tres campos
 
 | Parámetro | Descripción |
