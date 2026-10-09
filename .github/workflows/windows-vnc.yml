@@ -26,7 +26,7 @@ on:
         required: false
         default: '300'
       resolution:
-        description: '桌面分辨率'
+        description: '初始桌面分辨率（浏览器打开后会自动按窗口大小调整）'
         required: false
         default: '1920x1080'
         type: choice
@@ -136,6 +136,8 @@ jobs:
           }
           if (-not $ok) { throw "VNC port 5900 not ready" }
           Write-Host "VNC server ready"
+          # cloudflared path (used by both tunnels)
+          $cf = "$env:ProgramData\chocolatey\bin\cloudflared.exe"
           # 2a. Resolution API server (6081) + tunnel, for browser auto-resolution
           $apiLines = @(
           'import json, os',
@@ -209,8 +211,7 @@ jobs:
             $resp = Invoke-WebRequest -Uri "http://127.0.0.1:6080/vnc.html" -UseBasicParsing -TimeoutSec 10
             Write-Host "websockify HTTP check: $($resp.StatusCode)"
           } catch { throw "websockify HTTP check failed: $($_.Exception.Message)" }
-          # 3. cloudflared tunnel
-          $cf = "$env:ProgramData\chocolatey\bin\cloudflared.exe"
+          # 3. cloudflared tunnel (main, for noVNC)
           $cfProc = Start-Process $cf -ArgumentList @("tunnel", "--url", "http://127.0.0.1:6080", "--no-autoupdate") -PassThru -WindowStyle Hidden -RedirectStandardOutput "$env:TEMP\tunnel.log" -RedirectStandardError "$env:TEMP\tunnel.err"
           Write-Host "Waiting for tunnel URL..."
           $tunnelUrl = ""
