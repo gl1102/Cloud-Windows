@@ -12,7 +12,7 @@ Alakíts át egy ingyenes GitHub Actions Windows virtuális gépet böngészőb�
 - ⌨️ Beépített Sogou Pinyin beviteli mód, a kínai bevitel azonnal működik (nyomd meg a `Win + Space` billentyűt a kínai és az angol közötti váltáshoz)
 - 🖱️ Csatlakozz telefonról, tabletről vagy számítógépről
 - ⏱️ Minden futás legfeljebb ~6 óráig tart, és bármikor megszakíthatod
-- 📦 **RustDesk kiadás**: van egy RustDesk munkafolyamat is, amely automatikusan letölti a legfrissebb RustDesk-et a D meghajtóra, és csendben telepíti a `D:\RustDesk` mappába
+- 📦 **RustDesk kiadás**: van egy RustDesk munkafolyamat is, amely automatikusan letölti a legfrissebb RustDesk telepítőt az Asztalra
 
 ## 🚀 Használat (fork után azonnal működik)
 
@@ -27,7 +27,7 @@ Kattints a **Fork** gombra az oldal jobb felső sarkában, hogy a projektet a sa
 1. Menj a forkolt tároló oldalára, és kattints felül az **Actions** fülre
 2. Válassz egy munkafolyamatot bal oldalt (válassz egyet):
    - **Windows Cloud Desktop**: a normál felhő asztal
-   - **Windows Cloud Desktop + RustDesk**: normál kiadás, plusz a legfrissebb RustDesk automatikus letöltése a D meghajtóra, csendes telepítéssel a `D:\RustDesk` mappába (a verzió nincs beégetve — mindig a legfrissebb hivatalos kiadást tölti le)
+   - **Windows Cloud Desktop + RustDesk**: normál kiadás, plusz a legfrissebb RustDesk telepítő automatikus letöltése az Asztalra (a verzió nincs beégetve — mindig a legfrissebb hivatalos kiadást tölti le); távoli vezérléshez csak kattints duplán a telepítéshez
 3. Kattints a jobb oldali **Run workflow** gombra — felugrik egy párbeszédablak három beviteli mezővel:
 
 | Paraméter | Leírás |
