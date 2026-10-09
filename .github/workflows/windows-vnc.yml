@@ -102,13 +102,19 @@ jobs:
           $resParts = "${{ inputs.resolution }}".Split("x")
           $resW = [int]$resParts[0]; $resH = [int]$resParts[1]
           Add-Type 'using System; using System.Runtime.InteropServices; public class Dpy { [DllImport("user32.dll")] public static extern int ChangeDisplaySettings(ref DEVMODE dm, int flags); [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi)] public struct DEVMODE { [MarshalAs(UnmanagedType.ByValTStr, SizeConst=32)] public string dmDeviceName; public short dmSpecVersion; public short dmDriverVersion; public short dmSize; public short dmDriverExtra; public int dmFields; public int dmPositionX; public int dmPositionY; public int dmDisplayOrientation; public int dmDisplayFixedOutput; public short dmColor; public short dmDuplex; public short dmYResolution; public short dmTTOption; public short dmCollate; [MarshalAs(UnmanagedType.ByValTStr, SizeConst=32)] public string dmFormName; public short dmLogPixels; public int dmBitsPerPel; public int dmPelsWidth; public int dmPelsHeight; public int dmDisplayFlags; public int dmDisplayFrequency; public int dmICMMethod; public int dmICMIntent; public int dmMediaType; public int dmDitherType; public int dmReserved1; public int dmReserved2; public int dmPanningWidth; public int dmPanningHeight; } }'
-          $dm = New-Object Dpy+DEVMODE
-          $dm.dmSize = [Runtime.InteropServices.Marshal]::SizeOf($dm)
-          $dm.dmPelsWidth = $resW; $dm.dmPelsHeight = $resH
-          $dm.dmFields = 0x80000 -bor 0x100000
-          $cdsResult = [Dpy]::ChangeDisplaySettings([ref]$dm, 0)
+          function Set-DesktopRes($w, $h) {
+            $d = New-Object Dpy+DEVMODE
+            $d.dmSize = [Runtime.InteropServices.Marshal]::SizeOf($d)
+            $d.dmPelsWidth = $w; $d.dmPelsHeight = $h
+            $d.dmFields = 0x80000 -bor 0x100000
+            return [Dpy]::ChangeDisplaySettings([ref]$d, 0)
+          }
+          $cdsResult = Set-DesktopRes $resW $resH
           if ($cdsResult -eq 0) { Write-Host "Resolution set to ${resW}x${resH}" } else { Write-Host "WARNING: ChangeDisplaySettings returned $cdsResult, keeping default resolution" }
           Start-Sleep -Seconds 2
+          $currentRes = "${resW}x${resH}"
+          $resFile = "$env:TEMP\vnc_requested_res.txt"
+          if (Test-Path $resFile) { Remove-Item $resFile -Force }
           # All long-running services start in THIS step: background processes
           # started with Start-Process do not reliably survive across steps.
           $noVNC = "$env:TEMP\noVNC"
@@ -130,7 +136,68 @@ jobs:
           }
           if (-not $ok) { throw "VNC port 5900 not ready" }
           Write-Host "VNC server ready"
-          # 2. websockify: bridges noVNC web client (6080) to VNC (5900)
+          # 2a. Resolution API server (6081) + tunnel, for browser auto-resolution
+          $apiLines = @(
+          'import json, os',
+          'from http.server import BaseHTTPRequestHandler, HTTPServer',
+          'RES_FILE = os.path.join(os.environ["TEMP"], "vnc_requested_res.txt")',
+          'ALLOWED = {"1920x1080", "1600x900", "1366x768", "1280x720", "1024x768"}',
+          'class H(BaseHTTPRequestHandler):',
+          '    def _cors(self):',
+          '        self.send_header("Access-Control-Allow-Origin", "*")',
+          '        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")',
+          '        self.send_header("Access-Control-Allow-Headers", "Content-Type")',
+          '    def do_OPTIONS(self):',
+          '        self.send_response(200)',
+          '        self._cors()',
+          '        self.end_headers()',
+          '    def do_POST(self):',
+          '        if self.path == "/api/resolution":',
+          '            try:',
+          '                n = int(self.headers.get("Content-Length", 0))',
+          '                d = json.loads(self.rfile.read(n))',
+          '                r = str(int(d["w"])) + "x" + str(int(d["h"]))',
+          '                code = 200 if r in ALLOWED else 400',
+          '                if code == 200:',
+          '                    open(RES_FILE, "w").write(r)',
+          '            except Exception:',
+          '                code = 400',
+          '            self.send_response(code)',
+          '            self._cors()',
+          '            self.end_headers()',
+          '        else:',
+          '            self.send_response(404)',
+          '            self._cors()',
+          '            self.end_headers()',
+          '    def log_message(self, *a):',
+          '        pass',
+          'HTTPServer(("127.0.0.1", 6081), H).serve_forever()'
+          )
+          $apiLines | Set-Content "$env:TEMP\res_api.py" -Encoding ASCII
+          $apiProc = Start-Process python -ArgumentList @("$env:TEMP\res_api.py") -PassThru -WindowStyle Hidden
+          Start-Sleep -Seconds 3
+          if ($apiProc.HasExited) { throw "resolution API server failed to start" }
+          $cfApiProc = Start-Process $cf -ArgumentList @("tunnel", "--url", "http://127.0.0.1:6081", "--no-autoupdate") -PassThru -WindowStyle Hidden -RedirectStandardOutput "$env:TEMP\tunnel_api.log" -RedirectStandardError "$env:TEMP\tunnel_api.err"
+          Write-Host "Waiting for API tunnel URL..."
+          $apiUrl = ""
+          for ($i = 0; $i -lt 60; $i++) {
+            $m = Select-String -Path "$env:TEMP\tunnel_api.log", "$env:TEMP\tunnel_api.err" -Pattern 'https://[a-zA-Z0-9.-]+\.trycloudflare\.com' -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($m) { $apiUrl = $m.Matches[0].Value; break }
+            if ($cfApiProc.HasExited) { throw "api cloudflared exited early, code $($cfApiProc.ExitCode)" }
+            Start-Sleep -Seconds 2
+          }
+          if (-not $apiUrl) { throw "api tunnel URL not found" }
+          Write-Host "Resolution API ready"
+          # 2b. Inject auto-resolution JS into vnc.html (browser detects viewport, POSTs to API)
+          $vncHtmlPath = "$noVNC\vnc.html"
+          $htmlContent = Get-Content $vncHtmlPath -Raw -Encoding UTF8
+          $autoJs = '<script>(function(){var API="' + $apiUrl + '/api/resolution";var last="";function pick(w){if(w>=1700)return[1920,1080];if(w>=1400)return[1600,900];if(w>=1100)return[1366,768];if(w>=900)return[1280,720];return[1024,768];}function send(){var r=pick(window.innerWidth);var s=r[0]+"x"+r[1];if(s===last)return;last=s;fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({w:r[0],h:r[1]})}).catch(function(){});}var t;window.addEventListener("resize",function(){clearTimeout(t);t=setTimeout(send,1000);});setTimeout(send,1500);})();</script>'
+          if ($htmlContent -notmatch [regex]::Escape($apiUrl)) {
+            $htmlContent = $htmlContent.Replace("</body>", $autoJs + "</body>")
+            Set-Content $vncHtmlPath $htmlContent -Encoding UTF8 -NoNewline
+            Write-Host "Auto-resolution JS injected"
+          }
+          # 2c. websockify: bridges noVNC web client (6080) to VNC (5900)
           $wsArgs = @("-m", "websockify", "--web=$noVNC", "6080", "127.0.0.1:5900")
           $ws = Start-Process python -ArgumentList $wsArgs -PassThru -WindowStyle Hidden -RedirectStandardOutput "$env:TEMP\websockify.log" -RedirectStandardError "$env:TEMP\websockify.err"
           Start-Sleep -Seconds 4
@@ -167,4 +234,17 @@ jobs:
             Start-Sleep -Seconds 60
             if ($cfProc.HasExited) { Write-Host "WARNING: cloudflared died, exit code $($cfProc.ExitCode). Tunnel URL no longer works."; break }
             if ($ws.HasExited) { Write-Host "WARNING: websockify died, exit code $($ws.ExitCode)."; break }
+            if ($cfApiProc.HasExited) { Write-Host "WARNING: api cloudflared died, auto-resolution disabled." }
+            if ($apiProc.HasExited) { Write-Host "WARNING: resolution API died, auto-resolution disabled." }
+            # Auto-resolution: browser JS writes requested size to $resFile
+            if (Test-Path $resFile) {
+              $req = (Get-Content $resFile -Raw).Trim()
+              Remove-Item $resFile -Force -ErrorAction SilentlyContinue
+              if ($req -ne $currentRes -and $req -match '^\d+x\d+$') {
+                $pp = $req.Split("x"); $rw = [int]$pp[0]; $rh = [int]$pp[1]
+                $rr = Set-DesktopRes $rw $rh
+                if ($rr -eq 0) { $currentRes = $req; Write-Host "Auto-resolution: desktop now $req" }
+                else { Write-Host "WARNING: auto-resolution to $req failed (code $rr)" }
+              }
+            }
           }
