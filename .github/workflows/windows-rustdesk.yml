@@ -1,0 +1,67 @@
+# 免费 Windows 云桌面（RustDesk 版）- GitHub Actions workflow
+# 说明：GitHub 不提供 Windows 10 的 runner，这里开的是 Windows Server，
+#       桌面体验和 Win10 几乎一样，配置 4 核 16G。
+#       走 RustDesk 官方中继服务器，手机/电脑装 RustDesk 客户端直连，
+#       比网页 VNC 流畅，不用开浏览器。
+# 用法：
+# 1. 把本文件放到 .github/workflows/windows-rustdesk.yml（必须在 main 分支）
+# 2. 仓库页面 Actions -> "Windows RustDesk Desktop" -> Run workflow，
+#    填连接密码（用完即弃，别用常用密码） -> Run
+# 3. 等 3~5 分钟，在这次运行的日志里找到 RustDesk ID（一串数字）
+# 4. 手机/电脑安装 RustDesk 客户端，输入 ID 和你设置的密码，点连接
+# 5. 不用时去 Actions 页面 Cancel 这次运行（单次最长 6 小时，到时自动结束）
+
+name: Windows RustDesk Desktop
+
+on:
+  workflow_dispatch:
+    inputs:
+      rd_password:
+        description: 'RustDesk 连接密码（用完即弃，别用常用密码）'
+        required: true
+      run_minutes:
+        description: '本次运行时长（分钟，最多填 350）'
+        required: false
+        default: '300'
+
+jobs:
+  desktop:
+    runs-on: windows-latest
+    timeout-minutes: 360  # GitHub 单个 job 上限 6 小时
+    steps:
+      - name: 下载并启动 RustDesk
+        shell: powershell
+        run: |
+          # 从 GitHub API 取最新版下载地址（免硬编码版本号）
+          $rel = Invoke-RestMethod -Uri "https://api.github.com/repos/rustdesk/rustdesk/releases/latest"
+          $asset = $rel.assets | Where-Object { $_.name -like "rustdesk-*-x86_64.exe" -and $_.name -notlike "*sciter*" } | Select-Object -First 1
+          Write-Host "下载 $($asset.name) ..."
+          $rd = "$env:TEMP\rustdesk.exe"
+          Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $rd
+          # 先启动主程序（后台），再设密码、取 ID
+          Start-Process -FilePath $rd
+          Start-Sleep -Seconds 15
+          & $rd --password "${{ inputs.rd_password }}"
+          Start-Sleep -Seconds 5
+          # 等 ID 注册完成（最多约 2 分钟）
+          $rdId = ""
+          for ($i = 0; $i -lt 60; $i++) {
+            $rdId = (& $rd --get-id 2>$null | Out-String).Trim()
+            if ($rdId -match '^\d[\d ]*$') { break }
+            Start-Sleep -Seconds 2
+          }
+          if ($rdId -notmatch '^\d') { throw "未能获取到 RustDesk ID，请看上方日志排查" }
+          Write-Host ""
+          Write-Host "=================================================="
+          Write-Host "  RustDesk ID : $rdId"
+          Write-Host "  密码        : 你刚才在 Run workflow 时填的那个"
+          Write-Host "  手机/电脑装 RustDesk 客户端，填入上面两项即可连接"
+          Write-Host "=================================================="
+          Write-Host ""
+
+      - name: 保持运行
+        shell: powershell
+        run: |
+          $mins = [int]"${{ inputs.run_minutes }}"
+          Write-Host "保持运行 $mins 分钟（也可在 Actions 页面随时 Cancel 结束）"
+          Start-Sleep -Seconds ($mins * 60)
