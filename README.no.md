@@ -12,7 +12,7 @@ Gjør en gratis GitHub Actions-Windows-VM om til et skrivebord i skyen du kan br
 - ⌨️ Innebygd Sogou Pinyin-IME, kinesisk inndata fungerer med en gang (trykk `Win + Space` for å bytte mellom kinesisk og engelsk)
 - 🖱️ Koble til fra telefonen, nettbrettet eller datamaskinen
 - ⏱️ Hver kjøring varer opptil ~6 timer, og du kan avbryte når som helst
-- 📦 **RustDesk-utgave**: det finnes også en RustDesk-arbeidsflyt som automatisk laster ned den nyeste RustDesk-versjonen til D-stasjonen og installerer den lydløst til `D:\RustDesk`
+- 📦 **RustDesk-utgave**: det finnes også en RustDesk-arbeidsflyt som automatisk laster ned det nyeste RustDesk-installasjonsprogrammet til skrivebordet
 
 ## 🚀 Bruk (fungerer rett etter forking)
 
@@ -27,7 +27,7 @@ Klikk på **Fork**-knappen øverst til høyre på denne siden for å kopiere pro
 1. Gå til siden for det forkede depotet og klikk på **Actions**-fanen øverst
 2. Velg en arbeidsflyt til venstre (velg én):
    - **Windows Cloud Desktop**: det vanlige skrivebordet i skyen
-   - **Windows Cloud Desktop + RustDesk**: standardutgaven pluss automatisk nedlasting av den nyeste RustDesk-versjonen til D-stasjonen med lydløs installasjon til `D:\RustDesk` (versjonen er ikke hardkodet — henter alltid den nyeste offisielle utgaven)
+   - **Windows Cloud Desktop + RustDesk**: standardutgaven pluss automatisk nedlasting av det nyeste RustDesk-installasjonsprogrammet til skrivebordet (versjonen er ikke hardkodet — henter alltid den nyeste offisielle utgaven); dobbeltklikk for å installere når du trenger fjernkontroll
 3. Klikk på **Run workflow**-knappen til høyre — en dialog med tre inndatafelt dukker opp:
 
 | Parameter | Beskrivelse |
