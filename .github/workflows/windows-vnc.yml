@@ -87,8 +87,8 @@ jobs:
         run: |
           # NOTE: ASCII-only in script blocks, PS 5.1 misdecodes UTF-8 without BOM
           # Minimize this console window (the runner agent window cannot be closed)
-          Add-Type 'using System; using System.Runtime.InteropServices; public static class W { [DllImport("kernel32.dll")] public static extern IntPtr G(); [DllImport("user32.dll")] public static extern bool S(IntPtr h, int c); }'
-          [W]::S([W]::G(), 6) | Out-Null
+          Add-Type 'using System; using System.Runtime.InteropServices; public static class W { [DllImport("kernel32.dll")] public static extern IntPtr GetConsoleWindow(); [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow); }'
+          [W]::ShowWindow([W]::GetConsoleWindow(), 6) | Out-Null
           # All long-running services start in THIS step: background processes
           # started with Start-Process do not reliably survive across steps.
           $noVNC = "$env:TEMP\noVNC"
