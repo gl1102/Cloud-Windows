@@ -12,13 +12,13 @@
 - ⌨️ 内置搜狗输入法，中文输入开箱即用（`Win + Space` 切换中/英）
 - 🖱️ 手机、平板、电脑都能连
 - ⏱️ 单次最长运行约 6 小时，可随时取消
-- 📦 **RustDesk 版本**：另有带 RustDesk 的工作流，自动下载最新版 RustDesk 到 D 盘并静默安装到 `D:\RustDesk`
+- 📦 **RustDesk 版本**：另有带 RustDesk 的工作流，自动把最新版 RustDesk 安装包下载到桌面（需远程控制时自行安装或使用绿色版）
 
 ## 🚀 使用方法（fork 后即用）
 
 ### 第 1 步：Fork 本项目
 
-点击本页面右上角的 **Fork** 按钮，把项目复制到你自己的 GitHub 账号下。Fork 完成后你会进入 `你的用户名/Cloud-Windows` 这个仓库。
+点击本页面右上角的 **Fork** 按钮，把项目复制到你自己的 GitHub 账号下（fork 的是 `main` 分支，别选 `test` 分支，那是测试用的）。Fork 完成后你会进入 `你的用户名/Cloud-Windows` 这个仓库。
 
 > 💡 为什么要 fork？GitHub Actions 只能运行在你自己账号下的仓库里，fork 后你才有权限点运行。
 
@@ -27,7 +27,7 @@
 1. 进入你 fork 后的仓库页面，点击顶部 **Actions** 标签页
 2. 左侧选择工作流（二选一）：
    - **Windows Cloud Desktop**：标准版云桌面
-   - **Windows Cloud Desktop + RustDesk**：标准版基础上，自动下载最新版 RustDesk 到 D 盘并静默安装到 `D:\RustDesk`（版本号不硬编码，每次拿官方最新 release）
+   - **Windows Cloud Desktop + RustDesk**：标准版基础上，自动把最新版 RustDesk 安装包（`rustdesk-x.x.x-x86_64.exe`）下载到桌面（版本号不硬编码，每次拿官方最新 release）；需要用 RustDesk 远程控制时，请自行双击安装，或使用 RustDesk 绿色免安装版直接运行
 3. 点击右侧 **Run workflow** 按钮，会弹出三个输入框：
 
 | 参数 | 说明 |

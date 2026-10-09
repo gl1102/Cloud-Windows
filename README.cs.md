@@ -12,13 +12,13 @@ Proměňte bezplatný virtuální stroj Windows v GitHub Actions v cloudovou plo
 - ⌨️ Vestavěná čínská metoda zadávání Sogou Pinyin, čínský vstup funguje okamžitě (stisknutím `Win + Space` přepínáte mezi čínštinou a angličtinou)
 - 🖱️ Připojte se z telefonu, tabletu nebo počítače
 - ⏱️ Každé spuštění vydrží až ~6 hodin a můžete ho kdykoli zrušit
-- 📦 **Edice RustDesk**: je k dispozici i workflow RustDesk, který automaticky stáhne nejnovější RustDesk na disk D a tiše ho nainstaluje do `D:\RustDesk`
+- 📦 **Edice RustDesk**: je k dispozici i workflow RustDesk, který automaticky stáhne instalátor nejnovějšího RustDesku na Desktop (až budete potřebovat vzdálené ovládání, nainstalujte si ho sami nebo použijte přenosnou verzi)
 
 ## 🚀 Použití (funguje hned po forknutí)
 
 ### Krok 1: Forkněte tento projekt
 
-Klikněte na tlačítko **Fork** v pravém horním rohu této stránky a zkopírujte projekt do svého účtu GitHub. Po forku se ocitnete v repozitáři `your-username/Cloud-Windows`.
+Klikněte na tlačítko **Fork** v pravém horním rohu této stránky a zkopírujte projekt do svého účtu GitHub (forkujete větev `main` — nevybírejte větev `test`, ta je pro testování). Po forku se ocitnete v repozitáři `your-username/Cloud-Windows`.
 
 > 💡 Proč fork? GitHub Actions mohou běžet jen v repozitářích pod vaším účtem — forknutím získáte oprávnění je spouštět.
 
@@ -27,7 +27,7 @@ Klikněte na tlačítko **Fork** v pravém horním rohu této stránky a zkopír
 1. Přejděte na stránku svého forknutého repozitáře a klikněte nahoře na kartu **Actions**
 2. Vlevo vyberte workflow (vyberte jeden):
    - **Windows Cloud Desktop**: standardní cloudová plocha
-   - **Windows Cloud Desktop + RustDesk**: standardní edice plus automatické stažení nejnovějšího RustDesku na disk D s tichou instalací do `D:\RustDesk` (verze není napevno zadaná — vždy stahuje nejnovější oficiální vydání)
+  - **Windows Cloud Desktop + RustDesk**: standardní edice plus automatické stažení instalátoru nejnovějšího RustDesku na Desktop (`rustdesk-x.x.x-x86_64.exe`, verze není napevno zadaná — vždy stahuje nejnovější oficiální vydání); pokud potřebujete vzdálené ovládání přes RustDesk, nainstalujte si ho sami poklepáním, nebo rovnou spusťte přenosnou verzi RustDesku bez instalace
 3. Klikněte vpravo na tlačítko **Run workflow** — objeví se dialog se třemi vstupy:
 
 | Parametr | Popis |

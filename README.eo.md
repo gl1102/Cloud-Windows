@@ -12,13 +12,13 @@ Transformu senpagan GitHub Actions Vindozan VM-on en nubolan labortablon, alireb
 - ⌨️ Enkonstruita ĉina eniga metodo Sogou Pinyin, ĉina enigo funkcias tuj (premu `Win + Space` por ŝanĝi inter la ĉina kaj la angla)
 - 🖱️ Konektiĝu de via telefono, tablojdo aŭ komputilo
 - ⏱️ Ĉiu rulo daŭras ĝis ~6 horoj, kaj vi povas nuligi iam ajn
-- 📦 **RustDesk-eldono**: ekzistas ankaŭ RustDesk-laborfluo kiu aŭtomate elŝutas la plej novan RustDesk al la D-disko kaj silente instalas ĝin al `D:\RustDesk`
+- 📦 **RustDesk-eldono**: ekzistas ankaŭ RustDesk-laborfluo kiu aŭtomate elŝutas la plej novan RustDesk-instalilon al la labortablo (por fora stirado instalu mem aŭ uzu la porteblan version)
 
 ## 🚀 Uzo (funkcias tuj post forko)
 
 ### Paŝo 1: Forku ĉi tiun projekton
 
-Alklaku la butonon **Fork** en la supradekstra angulo de ĉi tiu paĝo por kopii la projekton al via propra GitHub-konto. Post forko vi alvenos en la deponejon `your-username/Cloud-Windows`.
+Alklaku la butonon **Fork** en la supradekstra angulo de ĉi tiu paĝo por kopii la projekton al via propra GitHub-konto (forkata estas la branĉo `main` — ne elektu la branĉon `test`, ĝi estas nur por testado). Post forko vi alvenos en la deponejon `your-username/Cloud-Windows`.
 
 > 💡 Kial forki? GitHub Actions povas funkcii nur en deponejoj sub via propra konto — forko donas al vi permeson funkciigi ĝin.
 
@@ -27,7 +27,7 @@ Alklaku la butonon **Fork** en la supradekstra angulo de ĉi tiu paĝo por kopii
 1. Iru al la paĝo de via forkita deponejo kaj alklaku la langeton **Actions** supre
 2. Elektu laborfluon maldekstre (elektu unu):
    - **Windows Cloud Desktop**: la norma nuba labortablo
-   - **Windows Cloud Desktop + RustDesk**: norma eldono plus aŭtomata elŝuto de la plej nova RustDesk al la D-disko kun silenta instalado al `D:\RustDesk` (versio ne estas fiksa — ĉiam prenas la plej novan oficialan eldonon)
+   - **Windows Cloud Desktop + RustDesk**: norma eldono plus aŭtomata elŝuto de la plej nova RustDesk-instalilo (`rustdesk-x.x.x-x86_64.exe`) al la labortablo (versio ne estas fiksa — ĉiam prenas la plej novan oficialan eldonon); kiam vi bezonas foran stiradon per RustDesk, duoble-klaku por mem instali, aŭ rekte uzu la porteblan RustDesk-version sen instalo
 3. Alklaku la butonon **Run workflow** dekstre — aperas dialogo kun tri enigaĵoj:
 
 | Parametro | Priskribo |

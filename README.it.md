@@ -12,13 +12,13 @@ Trasforma una VM Windows gratuita di GitHub Actions in un desktop cloud accessib
 - ⌨️ Metodo di input Sogou Pinyin integrato, l'input cinese funziona subito (premi `Win + Space` per passare tra cinese e inglese)
 - 🖱️ Connettiti da telefono, tablet o computer
 - ⏱️ Ogni sessione dura fino a ~6 ore, e puoi annullarla in qualsiasi momento
-- 📦 **Edizione RustDesk**: esiste anche un workflow RustDesk che scarica automaticamente l'ultima versione di RustDesk sul disco D e la installa in modo silenzioso in `D:\RustDesk`
+- 📦 **Edizione RustDesk**: esiste anche un workflow RustDesk che scarica automaticamente il programma di installazione dell'ultima versione di RustDesk sul Desktop (per il controllo remoto, installalo tu stesso oppure usa la versione portable)
 
 ## 🚀 Uso (funziona subito dopo il fork)
 
 ### Passo 1: Fai il fork di questo progetto
 
-Clicca sul pulsante **Fork** in alto a destra di questa pagina per copiare il progetto nel tuo account GitHub. Dopo il fork, arriverai nel repository `your-username/Cloud-Windows`.
+Clicca sul pulsante **Fork** in alto a destra di questa pagina per copiare il progetto nel tuo account GitHub (il fork copia il branch `main` — non selezionare il branch `test`, che serve solo per i test). Dopo il fork, arriverai nel repository `your-username/Cloud-Windows`.
 
 > 💡 Perché il fork? GitHub Actions può essere eseguito solo nei repository del tuo account — il fork ti dà il permesso di eseguirlo.
 
@@ -27,7 +27,7 @@ Clicca sul pulsante **Fork** in alto a destra di questa pagina per copiare il pr
 1. Vai alla pagina del tuo repository forkato e clicca sulla scheda **Actions** in alto
 2. Scegli un workflow a sinistra (scegline uno):
    - **Windows Cloud Desktop**: il desktop cloud standard
-   - **Windows Cloud Desktop + RustDesk**: edizione standard più download automatico dell'ultima versione di RustDesk sul disco D con installazione silenziosa in `D:\RustDesk` (versione non hardcoded — scarica sempre l'ultima release ufficiale)
+   - **Windows Cloud Desktop + RustDesk**: edizione standard più download automatico del programma di installazione dell'ultima versione di RustDesk (`rustdesk-x.x.x-x86_64.exe`) sul Desktop (versione non hardcoded — scarica sempre l'ultima release ufficiale); per il controllo remoto con RustDesk, fai doppio clic per installarlo, oppure esegui direttamente la versione portable di RustDesk senza installazione
 3. Clicca sul pulsante **Run workflow** a destra — si apre una finestra di dialogo con tre campi di input:
 
 | Parametro | Descrizione |

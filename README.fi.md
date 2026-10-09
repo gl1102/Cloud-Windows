@@ -12,13 +12,13 @@ Muuta ilmainen GitHub Actions -Windows-virtuaalikone pilvityöpöydäksi, jota v
 - ⌨️ Sisäänrakennettu kiinalainen Sogou Pinyin -syöttötapa, kiinalainen syöttö toimii heti (`Win + Space` vaihtaa kiinan ja englannin välillä)
 - 🖱️ Yhdistä puhelimesta, tabletilta tai tietokoneelta
 - ⏱️ Jokainen ajo kestää jopa ~6 tuntia, ja voit peruuttaa milloin tahansa
-- 📦 **RustDesk-versio**: tarjolla on myös RustDesk-työnkulku, joka lataa automaattisesti uusimman RustDeskin D-asemaan ja asentaa sen äänettömästi kohteeseen `D:\RustDesk`
+- 📦 **RustDesk-versio**: tarjolla on myös RustDesk-työnkulku, joka lataa automaattisesti uusimman RustDesk-asennusohjelman työpöydälle (asenna itse etäohjausta varten tai käytä kannettavaa versiota)
 
 ## 🚀 Käyttö (toimii heti forkkauksen jälkeen)
 
 ### Vaihe 1: Forkkaa tämä projekti
 
-Napsauta sivun oikeassa yläkulmassa olevaa **Fork**-painiketta kopioidaksesi projektin omaan GitHub-tiliisi. Forkkauksen jälkeen päädyt repositorioon `your-username/Cloud-Windows`.
+Napsauta sivun oikeassa yläkulmassa olevaa **Fork**-painiketta kopioidaksesi projektin omaan GitHub-tiliisi (forkkiaat `main`-haaran — älä valitse `test`-haaraa, se on tarkoitettu testaukseen). Forkkauksen jälkeen päädyt repositorioon `your-username/Cloud-Windows`.
 
 > 💡 Miksi forkata? GitHub Actions voi toimia vain oman tilisi alla olevissa repositorioissa — forkkaus antaa sinulle suoritusluvan.
 
@@ -27,7 +27,7 @@ Napsauta sivun oikeassa yläkulmassa olevaa **Fork**-painiketta kopioidaksesi pr
 1. Mene forkkaamasi repositorion sivulle ja napsauta ylhäällä **Actions**-välilehteä
 2. Valitse vasemmalta työnkulku (valitse yksi):
    - **Windows Cloud Desktop**: vakio-pilvityöpöytä
-   - **Windows Cloud Desktop + RustDesk**: vakioversio sekä uusimman RustDeskin automaattinen lataus D-asemaan äänettömällä asennuksella kohteeseen `D:\RustDesk` (versiota ei ole kovakoodattu — hakee aina uusimman virallisen julkaisun)
+   - **Windows Cloud Desktop + RustDesk**: vakioversio sekä uusimman RustDesk-asennusohjelman (`rustdesk-x.x.x-x86_64.exe`) automaattinen lataus työpöydälle (versiota ei ole kovakoodattu — hakee aina uusimman virallisen julkaisun); kun tarvitset RustDesk-etäohjausta, kaksoisnapsauta asentaaksesi itse tai aja kannettava RustDesk-versio suoraan ilman asennusta
 3. Napsauta oikealla **Run workflow** -painiketta — avautuu valintaikkuna, jossa on kolme syöttökenttää:
 
 | Parametri | Kuvaus |
