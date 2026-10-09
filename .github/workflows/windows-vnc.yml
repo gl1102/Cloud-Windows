@@ -76,6 +76,15 @@ jobs:
           # started with Start-Process do not reliably survive across steps.
           $noVNC = "$env:TEMP\noVNC"
           # 1. TightVNC server in application mode (captures current session desktop)
+          # Stop the system service first: MSI may have auto-started it, holding
+          # port 5900 with default config (loopback refused). We use app mode instead.
+          Stop-Service -Name "tvnserver" -ErrorAction SilentlyContinue
+          Start-Sleep -Seconds 3
+          $svc = Get-Service -Name "tvnserver" -ErrorAction SilentlyContinue
+          if ($svc -and $svc.Status -ne "Stopped") {
+            Stop-Process -Name "tvnserver" -Force -ErrorAction SilentlyContinue
+            Start-Sleep -Seconds 2
+          }
           Start-Process -FilePath "C:\Program Files\TightVNC\tvnserver.exe"
           $ok = $false
           for ($i = 0; $i -lt 30; $i++) {
