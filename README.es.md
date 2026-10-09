@@ -12,6 +12,7 @@ Convierte una máquina virtual Windows gratuita de GitHub Actions en un escritor
 - ⌨️ Método de entrada Sogou (搜狗输入法, Sogou Pinyin) integrado, chino listo para usar desde el primer momento (cambia entre chino e inglés con `Win + Space`)
 - 🖱️ Conéctate desde el móvil, la tableta o el ordenador
 - ⏱️ Cada ejecución dura hasta ~6 horas y puedes cancelarla cuando quieras
+- 📦 **Edición RustDesk**: también hay un workflow con RustDesk que descarga automáticamente el instalador más reciente de RustDesk al escritorio
 
 ## 🚀 Cómo usarlo (funciona nada más hacer fork)
 
@@ -24,7 +25,9 @@ Haz clic en el botón **Fork** arriba a la derecha de esta página para copiar e
 ### Paso 2: Inicia el escritorio en la nube
 
 1. Entra en la página del repositorio que forkeaste y haz clic en la pestaña **Actions** de arriba
-2. A la izquierda busca **Windows Cloud Desktop** y haz clic
+2. A la izquierda elige un workflow (uno de los dos):
+   - **Windows Cloud Desktop**: el escritorio en la nube estándar
+   - **Windows Cloud Desktop + RustDesk**: la edición estándar más la descarga automática del instalador más reciente de RustDesk al escritorio (la versión no está fijada en el código: siempre se obtiene la última release oficial)
 3. Haz clic en el botón **Run workflow** de la derecha: se abre un diálogo con tres campos
 
 | Parámetro | Descripción |
@@ -82,4 +85,4 @@ https://xxx-xxx-xxx.trycloudflare.com/vnc.html
 
 ## 🛠️ ¿Quieres modificarlo tú mismo?
 
-El archivo del workflow está en `.github/workflows/windows-vnc.yml`: puedes editarlo directamente en la web de GitHub y los cambios surten efecto al confirmar el commit.
+Los archivos del workflow están en `.github/workflows/` (`windows-vnc.yml` para la edición estándar, `windows-vnc-rustdesk.yml` para la edición RustDesk): puedes editarlos directamente en la web de GitHub y los cambios surten efecto al confirmar el commit.
