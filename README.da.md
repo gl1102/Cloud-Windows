@@ -12,7 +12,7 @@ Gør en gratis GitHub Actions Windows-VM til et cloud-skrivebord, du kan tilgå 
 - ⌨️ Indbygget Sogou Pinyin-tastaturmetode, kinesisk input virker med det samme (tryk på `Win + Space` for at skifte mellem kinesisk og engelsk)
 - 🖱️ Forbind fra din telefon, tablet eller computer
 - ⏱️ Hver kørsel varer op til ~6 timer, og du kan annullere når som helst
-- 📦 **RustDesk-udgave**: der er også en RustDesk-workflow, der automatisk downloader den nyeste RustDesk til D-drevet og installerer den lydløst til `D:\RustDesk`
+- 📦 **RustDesk-udgave**: der er også en RustDesk-workflow, der automatisk downloader den nyeste RustDesk-installer til Skrivebordet
 
 ## 🚀 Brug (virker lige efter forking)
 
@@ -27,7 +27,7 @@ Klik på knappen **Fork** øverst til højre på denne side for at kopiere proje
 1. Gå til din forkede repos side, og klik på fanen **Actions** øverst
 2. Vælg en workflow til venstre (vælg én):
    - **Windows Cloud Desktop**: standard-cloud-skrivebordet
-   - **Windows Cloud Desktop + RustDesk**: standardudgaven plus automatisk download af den nyeste RustDesk til D-drevet med lydløs installation til `D:\RustDesk` (versionen er ikke hardkodet — henter altid den nyeste officielle udgivelse)
+   - **Windows Cloud Desktop + RustDesk**: standardudgaven plus automatisk download af den nyeste RustDesk-installer til Skrivebordet (versionen er ikke hardkodet — henter altid den nyeste officielle udgivelse); dobbeltklik for at installere, når du har brug for fjernstyring
 3. Klik på knappen **Run workflow** til højre — en dialog med tre inputfelter dukker op:
 
 | Parameter | Beskrivelse |
