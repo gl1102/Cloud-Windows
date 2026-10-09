@@ -1,7 +1,6 @@
-# cloud-browser
-云浏览器
 
-免费云浏览器 - GitHub Actions workflow
+云Windows
+
 用法：
 1. fork本项目
 2. 打开你fork的项目，仓库页面点 Actions -> "Free Cloud Browser" -> Run workflow，填 VNC 密码 -> Run
