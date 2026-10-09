@@ -12,7 +12,7 @@ Ubah VM Windows gratis dari GitHub Actions menjadi desktop cloud yang bisa diaks
 - ⌨️ IME Sogou Pinyin bawaan, input bahasa Mandarin langsung bisa dipakai (tekan `Win + Space` untuk beralih antara Mandarin dan Inggris)
 - 🖱️ Terhubung dari ponsel, tablet, atau komputer
 - ⏱️ Setiap sesi berjalan hingga ~6 jam, dan bisa dibatalkan kapan saja
-- 📦 **Edisi RustDesk**: ada juga workflow RustDesk yang otomatis mengunduh RustDesk terbaru ke drive D dan menginstalnya secara diam-diam ke `D:\RustDesk`
+- 📦 **Edisi RustDesk**: ada juga workflow RustDesk yang otomatis mengunduh penginstal RustDesk terbaru ke Desktop
 
 ## 🚀 Penggunaan (langsung jalan setelah fork)
 
@@ -27,7 +27,7 @@ Klik tombol **Fork** di kanan atas halaman ini untuk menyalin proyek ke akun Git
 1. Buka halaman repo hasil fork Anda dan klik tab **Actions** di atas
 2. Pilih workflow di sebelah kiri (pilih satu):
    - **Windows Cloud Desktop**: desktop cloud standar
-   - **Windows Cloud Desktop + RustDesk**: edisi standar plus unduhan otomatis RustDesk terbaru ke drive D dengan instalasi diam-diam ke `D:\RustDesk` (versi tidak di-hardcode — selalu mengambil rilis resmi terbaru)
+   - **Windows Cloud Desktop + RustDesk**: edisi standar plus unduhan otomatis penginstal RustDesk terbaru ke Desktop (versi tidak di-hardcode — selalu mengambil rilis resmi terbaru); klik dua kali untuk menginstal saat butuh kendali jarak jauh
 3. Klik tombol **Run workflow** di kanan — dialog dengan tiga kolom input akan muncul:
 
 | Parameter | Deskripsi |
