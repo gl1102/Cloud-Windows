@@ -68,23 +68,20 @@ jobs:
           if ($null -ne $useAuth) { [Microsoft.Win32.Registry]::SetValue("HKEY_CURRENT_USER\SOFTWARE\TightVNC\Server", "UseVncAuthentication", $useAuth, [Microsoft.Win32.RegistryValueKind]::DWord) }
           Write-Host "TightVNC installed, password set, loopback allowed"
 
-      - name: 下载并安装 RustDesk 到 D 盘
+      - name: 下载 RustDesk 安装包到桌面
         shell: powershell
         run: |
           # NOTE: ASCII-only in script blocks, PS 5.1 misdecodes UTF-8 without BOM
-          # Download latest RustDesk x86_64 installer to D: and silently install to D:\RustDesk
+          # Download latest RustDesk x86_64 installer to Desktop (dynamic version)
           $rel = Invoke-RestMethod -Uri "https://api.github.com/repos/rustdesk/rustdesk/releases/latest" -UseBasicParsing
           $asset = $rel.assets | Where-Object { $_.name -match "^rustdesk-.*-x86_64\.exe$" } | Select-Object -First 1
           if (-not $asset) { throw "RustDesk x86_64 exe not found in latest release" }
-          $installer = Join-Path "D:\" $asset.name
-          Write-Host "Downloading $($asset.name) to D:\..."
-          Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $installer -UseBasicParsing
-          $installDir = "D:\RustDesk"
-          Write-Host "Silently installing to $installDir..."
-          $proc = Start-Process -FilePath $installer -ArgumentList "/S", "/D=$installDir" -Wait -PassThru
-          if ($proc.ExitCode -ne 0) { throw "RustDesk silent install failed, exit code $($proc.ExitCode)" }
-          if (-not (Test-Path "$installDir\rustdesk.exe")) { throw "RustDesk not found in $installDir after install" }
-          Write-Host "RustDesk installed to $installDir"
+          $desktop = [Environment]::GetFolderPath("Desktop")
+          $dest = Join-Path $desktop $asset.name
+          Write-Host "Downloading $($asset.name)..."
+          Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $dest -UseBasicParsing
+          Write-Host "RustDesk installer on Desktop: $($asset.name)"
+
       - name: 安装搜狗输入法
         shell: powershell
         run: |
