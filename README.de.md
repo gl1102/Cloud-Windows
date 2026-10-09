@@ -12,7 +12,7 @@ Verwandle eine kostenlose GitHub-Actions-Windows-VM in einen Cloud-Desktop, auf 
 - ⌨️ Eingebaute Sogou-Pinyin-Eingabemethode, chinesische Eingabe funktioniert sofort (`Win + Space` drücken, um zwischen Chinesisch und Englisch zu wechseln)
 - 🖱️ Von Handy, Tablet oder Computer verbinden
 - ⏱️ Jeder Durchlauf dauert bis zu ~6 Stunden, und du kannst jederzeit abbrechen
-- 📦 **RustDesk-Edition**: Es gibt auch einen RustDesk-Workflow, der automatisch das neueste RustDesk auf das D-Laufwerk herunterlädt und still nach `D:\RustDesk` installiert
+- 📦 **RustDesk-Edition**: Es gibt auch einen RustDesk-Workflow, der automatisch das neueste RustDesk-Installationsprogramm auf den Desktop herunterlädt
 
 ## 🚀 Verwendung (funktioniert direkt nach dem Forken)
 
@@ -27,7 +27,7 @@ Klicke oben rechts auf dieser Seite auf den **Fork**-Button, um das Projekt in d
 1. Gehe auf die Seite deines geforkten Repos und klicke oben auf den **Actions**-Tab
 2. Wähle links einen Workflow aus (einen auswählen):
    - **Windows Cloud Desktop**: der Standard-Cloud-Desktop
-   - **Windows Cloud Desktop + RustDesk**: Standard-Edition plus automatischer Download des neuesten RustDesk auf das D-Laufwerk mit stiller Installation nach `D:\RustDesk` (Version nicht fest kodiert — lädt immer das neueste offizielle Release)
+   - **Windows Cloud Desktop + RustDesk**: Standard-Edition plus automatischer Download des neuesten RustDesk-Installationsprogramms auf den Desktop (Version nicht fest kodiert — lädt immer das neueste offizielle Release); bei Bedarf an Fernsteuerung einfach doppelklicken, um zu installieren
 3. Klicke rechts auf den **Run workflow**-Button — ein Dialog mit drei Eingabefeldern öffnet sich:
 
 | Parameter | Beschreibung |
