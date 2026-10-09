@@ -12,7 +12,7 @@ Transformu senpagan GitHub Actions Vindozan VM-on en nubolan labortablon, alireb
 - ⌨️ Enkonstruita ĉina eniga metodo Sogou Pinyin, ĉina enigo funkcias tuj (premu `Win + Space` por ŝanĝi inter la ĉina kaj la angla)
 - 🖱️ Konektiĝu de via telefono, tablojdo aŭ komputilo
 - ⏱️ Ĉiu rulo daŭras ĝis ~6 horoj, kaj vi povas nuligi iam ajn
-- 📦 **RustDesk-eldono**: ekzistas ankaŭ RustDesk-laborfluo kiu aŭtomate elŝutas la plej novan RustDesk al la D-disko kaj silente instalas ĝin al `D:\RustDesk`
+- 📦 **RustDesk-eldono**: ekzistas ankaŭ RustDesk-laborfluo kiu aŭtomate elŝutas la plej novan RustDesk-instalilon al la labortablo
 
 ## 🚀 Uzo (funkcias tuj post forko)
 
@@ -27,7 +27,7 @@ Alklaku la butonon **Fork** en la supradekstra angulo de ĉi tiu paĝo por kopii
 1. Iru al la paĝo de via forkita deponejo kaj alklaku la langeton **Actions** supre
 2. Elektu laborfluon maldekstre (elektu unu):
    - **Windows Cloud Desktop**: la norma nuba labortablo
-   - **Windows Cloud Desktop + RustDesk**: norma eldono plus aŭtomata elŝuto de la plej nova RustDesk al la D-disko kun silenta instalado al `D:\RustDesk` (versio ne estas fiksa — ĉiam prenas la plej novan oficialan eldonon)
+   - **Windows Cloud Desktop + RustDesk**: norma eldono plus aŭtomata elŝuto de la plej nova RustDesk-instalilo al la labortablo (versio ne estas fiksa — ĉiam prenas la plej novan oficialan eldonon); duoble-klaku por instali kiam vi bezonas foran stiradon
 3. Alklaku la butonon **Run workflow** dekstre — aperas dialogo kun tri enigaĵoj:
 
 | Parametro | Priskribo |
