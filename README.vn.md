@@ -12,13 +12,13 @@ Biến máy ảo Windows miễn phí của GitHub Actions thành một máy tín
 - ⌨️ Bộ gõ Sogou Pinyin tích hợp sẵn, nhập tiếng Trung hoạt động ngay (nhấn `Win + Space` để chuyển giữa tiếng Trung và tiếng Anh)
 - 🖱️ Kết nối từ điện thoại, máy tính bảng hoặc máy tính
 - ⏱️ Mỗi lần chạy kéo dài tới ~6 giờ, và bạn có thể hủy bất cứ lúc nào
-- 📦 **Phiên bản RustDesk**: còn có một workflow RustDesk tự động tải file cài đặt RustDesk mới nhất về màn hình nền (Desktop)
+- 📦 **Phiên bản RustDesk**: còn có một workflow RustDesk tự động tải file cài đặt RustDesk mới nhất về màn hình nền (Desktop) (khi cần điều khiển từ xa, hãy tự cài đặt hoặc dùng bản portable)
 
 ## 🚀 Cách dùng (dùng được ngay sau khi fork)
 
 ### Bước 1: Fork dự án này
 
-Nhấn nút **Fork** ở góc trên bên phải trang này để sao chép dự án về tài khoản GitHub của bạn. Sau khi fork, bạn sẽ ở trong kho `your-username/Cloud-Windows`.
+Nhấn nút **Fork** ở góc trên bên phải trang này để sao chép dự án về tài khoản GitHub của bạn (fork nhánh `main`, đừng chọn nhánh `test` — nhánh đó chỉ để thử nghiệm). Sau khi fork, bạn sẽ ở trong kho `your-username/Cloud-Windows`.
 
 > 💡 Vì sao phải fork? GitHub Actions chỉ chạy được trên các kho thuộc tài khoản của bạn — fork giúp bạn có quyền chạy nó.
 
@@ -27,7 +27,7 @@ Nhấn nút **Fork** ở góc trên bên phải trang này để sao chép dự 
 1. Vào trang kho đã fork của bạn và nhấn tab **Actions** ở trên cùng
 2. Chọn một workflow ở bên trái (chọn một):
    - **Windows Cloud Desktop**: máy tính đám mây tiêu chuẩn
-   - **Windows Cloud Desktop + RustDesk**: bản tiêu chuẩn cộng thêm tự động tải file cài đặt RustDesk mới nhất về màn hình nền (Desktop) (phiên bản không bị cố định — luôn lấy bản phát hành chính thức mới nhất); khi cần điều khiển từ xa, chỉ cần nhấp đúp để cài đặt
+   - **Windows Cloud Desktop + RustDesk**: bản tiêu chuẩn cộng thêm tự động tải file cài đặt RustDesk mới nhất (`rustdesk-x.x.x-x86_64.exe`) về màn hình nền (Desktop) (phiên bản không bị cố định — luôn lấy bản phát hành chính thức mới nhất); khi cần điều khiển từ xa bằng RustDesk, hãy nhấp đúp để tự cài đặt, hoặc chạy trực tiếp bản portable (không cần cài đặt) của RustDesk
 3. Nhấn nút **Run workflow** ở bên phải — một hộp thoại với ba ô nhập hiện ra:
 
 | Tham số | Mô tả |
