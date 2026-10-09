@@ -12,13 +12,13 @@ Przekształć darmową maszynę wirtualną Windows z GitHub Actions w pulpit chm
 - ⌨️ Wbudowany edytor IME Sogou Pinyin, wprowadzanie chińskich znaków działa od razu (naciśnij `Win + Space`, aby przełączać się między chińskim a angielskim)
 - 🖱️ Połącz się z telefonu, tabletu lub komputera
 - ⏱️ Każde uruchomienie trwa do ~6 godzin i możesz je anulować w dowolnym momencie
-- 📦 **Wersja RustDesk**: dostępny jest też przepływ pracy RustDesk, który automatycznie pobiera najnowszy instalator RustDesk na Pulpit
+- 📦 **Wersja RustDesk**: dostępny jest też przepływ pracy RustDesk, który automatycznie pobiera najnowszy instalator RustDesk na Pulpit (gdy potrzebujesz zdalnego sterowania, zainstaluj go samodzielnie lub użyj wersji portable)
 
 ## 🚀 Użycie (działa od razu po sforkowania)
 
 ### Krok 1: Sforkuj ten projekt
 
-Kliknij przycisk **Fork** w prawym górnym rogu tej strony, aby skopiować projekt na własne konto GitHub. Po zrobieniu forka znajdziesz się w repozytorium `your-username/Cloud-Windows`.
+Kliknij przycisk **Fork** w prawym górnym rogu tej strony, aby skopiować projekt na własne konto GitHub (zforkuj gałąź `main`, nie wybieraj gałęzi `test` — jest tylko do testów). Po zrobieniu forka znajdziesz się w repozytorium `your-username/Cloud-Windows`.
 
 > 💡 Po co fork? GitHub Actions może działać tylko w repozytoriach pod Twoim kontem — fork daje Ci uprawnienia do uruchomienia.
 
@@ -27,7 +27,7 @@ Kliknij przycisk **Fork** w prawym górnym rogu tej strony, aby skopiować proje
 1. Przejdź do strony swojego sforknowanego repozytorium i kliknij zakładkę **Actions** u góry
 2. Wybierz przepływ pracy po lewej (wybierz jeden):
    - **Windows Cloud Desktop**: standardowy pulpit chmurowy
-   - **Windows Cloud Desktop + RustDesk**: edycja standardowa plus automatyczne pobieranie najnowszego instalatora RustDesk na Pulpit (wersja nie jest wpisana na sztywno — zawsze pobiera najnowsze oficjalne wydanie); gdy potrzebujesz zdalnego sterowania, wystarczy kliknąć dwukrotnie, aby zainstalować
+   - **Windows Cloud Desktop + RustDesk**: edycja standardowa plus automatyczne pobieranie najnowszego instalatora RustDesk (`rustdesk-x.x.x-x86_64.exe`) na Pulpit (wersja nie jest wpisana na sztywno — zawsze pobiera najnowsze oficjalne wydanie); gdy potrzebujesz zdalnego sterowania przez RustDesk, kliknij dwukrotnie, aby samodzielnie zainstalować, lub uruchom wersję portable RustDesk bez instalacji
 3. Kliknij przycisk **Run workflow** po prawej — wyskoczy okno dialogowe z trzema polami wejściowymi:
 
 | Parametr | Opis |
