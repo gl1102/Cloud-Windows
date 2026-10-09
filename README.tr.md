@@ -12,7 +12,7 @@
 - ⌨️ Yerleşik Sogou Pinyin IME, Çince girişi kutudan çıktığı gibi çalışır (`Win + Space` tuşlarıyla Çince ve İngilizce arasında geçiş yapın)
 - 🖱️ Telefonunuzdan, tabletinizden veya bilgisayarınızdan bağlanın
 - ⏱️ Her çalıştırma ~6 saate kadar sürer ve istediğiniz zaman iptal edebilirsiniz
-- 📦 **RustDesk sürümü**: en son RustDesk'i otomatik olarak D sürücüsüne indirip `D:\RustDesk` konumuna sessizce kuran bir RustDesk iş akışı da var
+- 📦 **RustDesk sürümü**: en son RustDesk kurulum dosyasını otomatik olarak Masaüstü'ne indiren bir RustDesk iş akışı da var
 
 ## 🚀 Kullanım (fork'tan hemen sonra çalışır)
 
@@ -27,7 +27,7 @@ Projeyi kendi GitHub hesabınıza kopyalamak için bu sayfanın sağ üst köşe
 1. Fork'ladığınız deponun sayfasına gidin ve üstteki **Actions** sekmesine tıklayın
 2. Soldan bir iş akışı seçin (birini seçin):
    - **Windows Cloud Desktop**: standart bulut masaüstü
-   - **Windows Cloud Desktop + RustDesk**: standart sürüm artı en son RustDesk'in D sürücüsüne otomatik indirilmesi ve `D:\RustDesk` konumuna sessiz kurulumu (sürüm sabit kodlanmamış — her zaman en son resmi sürümü alır)
+   - **Windows Cloud Desktop + RustDesk**: standart sürüm artı en son RustDesk kurulum dosyasının Masaüstü'ne otomatik indirilmesi (sürüm sabit kodlanmamış — her zaman en son resmi sürümü alır); uzaktan kontrole ihtiyacınız olduğunda çift tıklayarak kurun
 3. Sağdaki **Run workflow** düğmesine tıklayın — üç giriş alanlı bir iletişim kutusu açılır:
 
 | Parametre | Açıklama |
