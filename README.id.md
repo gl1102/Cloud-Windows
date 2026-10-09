@@ -12,13 +12,13 @@ Ubah VM Windows gratis dari GitHub Actions menjadi desktop cloud yang bisa diaks
 - ⌨️ IME Sogou Pinyin bawaan, input bahasa Mandarin langsung bisa dipakai (tekan `Win + Space` untuk beralih antara Mandarin dan Inggris)
 - 🖱️ Terhubung dari ponsel, tablet, atau komputer
 - ⏱️ Setiap sesi berjalan hingga ~6 jam, dan bisa dibatalkan kapan saja
-- 📦 **Edisi RustDesk**: ada juga workflow RustDesk yang otomatis mengunduh penginstal RustDesk terbaru ke Desktop
+- 📦 **Edisi RustDesk**: ada juga workflow RustDesk yang otomatis mengunduh penginstal RustDesk terbaru ke Desktop (untuk kendali jarak jauh, instal sendiri atau gunakan versi portable)
 
 ## 🚀 Penggunaan (langsung jalan setelah fork)
 
 ### Langkah 1: Fork proyek ini
 
-Klik tombol **Fork** di kanan atas halaman ini untuk menyalin proyek ke akun GitHub Anda sendiri. Setelah di-fork, Anda akan masuk ke repositori `your-username/Cloud-Windows`.
+Klik tombol **Fork** di kanan atas halaman ini untuk menyalin proyek ke akun GitHub Anda sendiri (yang di-fork adalah branch `main` — jangan pilih branch `test`, itu untuk pengujian). Setelah di-fork, Anda akan masuk ke repositori `your-username/Cloud-Windows`.
 
 > 💡 Kenapa fork? GitHub Actions hanya bisa berjalan di repositori di bawah akun Anda sendiri — fork memberi Anda izin untuk menjalankannya.
 
@@ -27,7 +27,7 @@ Klik tombol **Fork** di kanan atas halaman ini untuk menyalin proyek ke akun Git
 1. Buka halaman repo hasil fork Anda dan klik tab **Actions** di atas
 2. Pilih workflow di sebelah kiri (pilih satu):
    - **Windows Cloud Desktop**: desktop cloud standar
-   - **Windows Cloud Desktop + RustDesk**: edisi standar plus unduhan otomatis penginstal RustDesk terbaru ke Desktop (versi tidak di-hardcode — selalu mengambil rilis resmi terbaru); klik dua kali untuk menginstal saat butuh kendali jarak jauh
+   - **Windows Cloud Desktop + RustDesk**: edisi standar plus unduhan otomatis penginstal RustDesk terbaru (`rustdesk-x.x.x-x86_64.exe`) ke Desktop (versi tidak di-hardcode — selalu mengambil rilis resmi terbaru); untuk kendali jarak jauh dengan RustDesk, klik dua kali untuk menginstal, atau jalankan langsung versi portable RustDesk tanpa instalasi
 3. Klik tombol **Run workflow** di kanan — dialog dengan tiga kolom input akan muncul:
 
 | Parameter | Deskripsi |
