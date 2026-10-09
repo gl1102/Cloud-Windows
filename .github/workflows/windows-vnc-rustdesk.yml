@@ -1,0 +1,296 @@
+# 免费 Windows 云桌面（网页版 VNC）- GitHub Actions workflow
+# 说明：GitHub 不提供 Windows 10 的 runner，这里开的是 Windows Server，
+#       桌面体验和 Win10 几乎一样，配置 4 核 16G。
+# 用法：
+# 1. 把本文件放到 .github/workflows/windows-vnc.yml（必须在 main 分支）
+# 2. 仓库页面 Actions -> "Windows Cloud Desktop" -> Run workflow，
+#    填 VNC 密码（只用英文/数字，最多8位有效，用完即弃） -> Run
+# 3. 等 4~6 分钟（要下载安装 TightVNC），在这次运行的日志里找到
+#    https://xxx.trycloudflare.com/vnc.html，浏览器打开
+# 4. 点 Connect，输入 VNC 密码，就能用了
+# 5. 不用时去 Actions 页面 Cancel 这次运行（单次最长 6 小时，到时自动结束）
+#
+# 注意：下面 powershell 脚本里刻意只用英文输出，因为 Windows PowerShell 5.1
+# 会把无 BOM 的 UTF-8 文件按 ANSI 解码，中文会被误读成智能引号导致解析失败。
+
+name: Windows Cloud Desktop + RustDesk
+
+on:
+  workflow_dispatch:
+    inputs:
+      vnc_password:
+        description: 'VNC 连接密码（只用英文/数字，最多8位有效，用完即弃）'
+        required: true
+      run_minutes:
+        description: '本次运行时长（分钟，最多填 350）'
+        required: false
+        default: '300'
+      resolution:
+        description: '初始桌面分辨率（浏览器打开后会自动按窗口大小调整）'
+        required: false
+        default: '1920x1080'
+        type: choice
+        options:
+          - 1920x1080
+          - 1600x900
+          - 1440x900
+          - 1366x768
+
+jobs:
+  desktop:
+    runs-on: windows-latest
+    timeout-minutes: 360  # GitHub 单个 job 上限 6 小时
+    steps:
+      - name: 安装 TightVNC 服务端（含 VNC 密码）
+        shell: powershell
+        run: |
+          # NOTE: ASCII-only in script blocks, PS 5.1 misdecodes UTF-8 without BOM
+          $msi = "$env:TEMP\tightvnc.msi"
+          Invoke-WebRequest -Uri "https://www.tightvnc.com/download/2.8.90/tightvnc-2.8.90-gpl-setup-64bit.msi" -OutFile $msi
+          $vncPass = "${{ inputs.vnc_password }}"
+          $msiArgs = @("/i", $msi, "/quiet", "/norestart", "ADDLOCAL=Server",
+                    "SET_USEVNCAUTHENTICATION=1", "VALUE_OF_USEVNCAUTHENTICATION=1",
+                    "SET_PASSWORD=1", "VALUE_OF_PASSWORD=$vncPass")
+          $p = Start-Process msiexec -ArgumentList $msiArgs -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "TightVNC install failed, exit code $($p.ExitCode)" }
+          # Verify the password was actually written; abort instead of exposing a passwordless desktop
+          $reg = Get-ItemProperty -Path "HKLM:\SOFTWARE\TightVNC\Server" -Name "Password" -ErrorAction SilentlyContinue
+          if (-not $reg) { throw "VNC password was not set, aborting to avoid passwordless exposure" }
+          # Allow loopback connections (websockify connects via 127.0.0.1)
+          Set-ItemProperty -Path "HKLM:\SOFTWARE\TightVNC\Server" -Name "AllowLoopback" -Value 1 -Type DWord
+          $hkcuTvn = "HKCU:\SOFTWARE\TightVNC\Server"
+          if (-not (Test-Path $hkcuTvn)) { New-Item -Path $hkcuTvn -Force | Out-Null }
+          Set-ItemProperty -Path $hkcuTvn -Name "AllowLoopback" -Value 1 -Type DWord
+          # Application mode reads HKCU, not HKLM: copy auth config over (binary-safe via .NET)
+          $pwBytes = [Microsoft.Win32.Registry]::GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\TightVNC\Server", "Password", $null)
+          if ($pwBytes) { [Microsoft.Win32.Registry]::SetValue("HKEY_CURRENT_USER\SOFTWARE\TightVNC\Server", "Password", $pwBytes, [Microsoft.Win32.RegistryValueKind]::Binary) }
+          $useAuth = [Microsoft.Win32.Registry]::GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\TightVNC\Server", "UseVncAuthentication", $null)
+          if ($null -ne $useAuth) { [Microsoft.Win32.Registry]::SetValue("HKEY_CURRENT_USER\SOFTWARE\TightVNC\Server", "UseVncAuthentication", $useAuth, [Microsoft.Win32.RegistryValueKind]::DWord) }
+          Write-Host "TightVNC installed, password set, loopback allowed"
+
+      - name: 下载 RustDesk 安装包到桌面
+        shell: powershell
+        run: |
+          # NOTE: ASCII-only in script blocks, PS 5.1 misdecodes UTF-8 without BOM
+          # Download latest RustDesk x86_64 installer to Desktop (dynamic version)
+          $rel = Invoke-RestMethod -Uri "https://api.github.com/repos/rustdesk/rustdesk/releases/latest" -UseBasicParsing
+          $asset = $rel.assets | Where-Object { $_.name -match "^rustdesk-.*-x86_64\.exe$" } | Select-Object -First 1
+          if (-not $asset) { throw "RustDesk x86_64 exe not found in latest release" }
+          $desktop = [Environment]::GetFolderPath("Desktop")
+          $dest = Join-Path $desktop $asset.name
+          Write-Host "Downloading $($asset.name)..."
+          Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $dest -UseBasicParsing
+          Write-Host "RustDesk installer on Desktop: $($asset.name)"
+
+      - name: 安装搜狗输入法
+        shell: powershell
+        run: |
+          # NOTE: ASCII-only in script blocks, PS 5.1 misdecodes UTF-8 without BOM
+          # Install Sogou Pinyin IME via winget (silent install)
+          winget install --id Sogou.SogouInput -e --silent --accept-package-agreements --accept-source-agreements
+          if ($LASTEXITCODE -ne 0) { Write-Host "WARNING: Sogou install exit code $LASTEXITCODE" }
+          else { Write-Host "Sogou Pinyin installed, switch input with Win+Space" }
+
+      - name: 准备 noVNC 网页端和 cloudflared
+        shell: powershell
+        run: |
+          # NOTE: ASCII-only in script blocks, PS 5.1 misdecodes UTF-8 without BOM
+          $noVNC = "$env:TEMP\noVNC"
+          if (-not (Test-Path "$noVNC\vnc.html")) {
+            if (Test-Path $noVNC) { Remove-Item -Recurse -Force $noVNC }
+            git clone -q --depth 1 https://github.com/novnc/noVNC.git $noVNC
+          }
+          if (-not (Test-Path "$noVNC\vnc.html")) { throw "noVNC download failed" }
+          python -m pip install -q websockify
+          if ($LASTEXITCODE -ne 0) { throw "pip install websockify failed" }
+          choco install cloudflared -y --no-progress
+          Write-Host "noVNC files and cloudflared ready"
+
+      - name: 启动服务并建立隧道（在下方日志里找访问地址）
+        shell: powershell
+        run: |
+          # NOTE: ASCII-only in script blocks, PS 5.1 misdecodes UTF-8 without BOM
+          # Minimize this console window (the runner agent window cannot be closed)
+          Add-Type 'using System; using System.Runtime.InteropServices; public static class W { [DllImport("kernel32.dll")] public static extern IntPtr GetConsoleWindow(); [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow); }'
+          [W]::ShowWindow([W]::GetConsoleWindow(), 6) | Out-Null
+          # Set desktop resolution via Win32 API (default 1920x1080, selectable at Run)
+          $resParts = "${{ inputs.resolution }}".Split("x")
+          $resW = [int]$resParts[0]; $resH = [int]$resParts[1]
+          Add-Type 'using System; using System.Runtime.InteropServices; public class Dpy { [DllImport("user32.dll")] public static extern int ChangeDisplaySettings(ref DEVMODE dm, int flags); [DllImport("user32.dll")] public static extern bool EnumDisplaySettings(string deviceName, int modeNum, ref DEVMODE devMode); [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi)] public struct DEVMODE { [MarshalAs(UnmanagedType.ByValTStr, SizeConst=32)] public string dmDeviceName; public short dmSpecVersion; public short dmDriverVersion; public short dmSize; public short dmDriverExtra; public int dmFields; public int dmPositionX; public int dmPositionY; public int dmDisplayOrientation; public int dmDisplayFixedOutput; public short dmColor; public short dmDuplex; public short dmYResolution; public short dmTTOption; public short dmCollate; [MarshalAs(UnmanagedType.ByValTStr, SizeConst=32)] public string dmFormName; public short dmLogPixels; public int dmBitsPerPel; public int dmPelsWidth; public int dmPelsHeight; public int dmDisplayFlags; public int dmDisplayFrequency; public int dmICMMethod; public int dmICMIntent; public int dmMediaType; public int dmDitherType; public int dmReserved1; public int dmReserved2; public int dmPanningWidth; public int dmPanningHeight; } }'
+          function Set-DesktopRes($w, $h) {
+            $d = New-Object Dpy+DEVMODE
+            $d.dmSize = [Runtime.InteropServices.Marshal]::SizeOf($d)
+            $d.dmPelsWidth = $w; $d.dmPelsHeight = $h
+            $d.dmFields = 0x80000 -bor 0x100000
+            return [Dpy]::ChangeDisplaySettings([ref]$d, 0)
+          }
+          $cdsResult = Set-DesktopRes $resW $resH
+          if ($cdsResult -eq 0) { Write-Host "Resolution set to ${resW}x${resH}" } else { Write-Host "WARNING: ChangeDisplaySettings returned $cdsResult, keeping default resolution" }
+          Start-Sleep -Seconds 2
+          $currentRes = "${resW}x${resH}"
+          $resFile = "$env:TEMP\vnc_requested_res.txt"
+          if (Test-Path $resFile) { Remove-Item $resFile -Force }
+          # Enumerate GPU supported display modes, only allow those
+          $preferred = @("1920x1080", "1600x900", "1440x900", "1366x768", "1280x720", "1024x768")
+          $gpuModes = @()
+          $mi = 0
+          while ($true) {
+            $emd = New-Object Dpy+DEVMODE
+            $emd.dmSize = [Runtime.InteropServices.Marshal]::SizeOf($emd)
+            if (-not [Dpy]::EnumDisplaySettings($null, $mi, [ref]$emd)) { break }
+            $gpuModes += "$($emd.dmPelsWidth)x$($emd.dmPelsHeight)"
+            $mi++
+            if ($mi -gt 200) { break }
+          }
+          $gpuModes = $gpuModes | Sort-Object -Unique
+          Write-Host "GPU modes: $($gpuModes -join ', ')"
+          $allowed = @($preferred | Where-Object { $gpuModes -contains $_ })
+          if ($allowed.Count -eq 0) { $allowed = $preferred; Write-Host "WARNING: enumeration empty, using defaults" }
+          Write-Host "Allowed resolutions: $($allowed -join ', ')"
+          $allowed | Set-Content "$env:TEMP\allowed_res.txt" -Encoding ASCII
+          # All long-running services start in THIS step: background processes
+          # started with Start-Process do not reliably survive across steps.
+          $noVNC = "$env:TEMP\noVNC"
+          # 1. TightVNC server in application mode (captures current session desktop)
+          # Stop the system service first: MSI may have auto-started it, holding
+          # port 5900 with default config (loopback refused). We use app mode instead.
+          Stop-Service -Name "tvnserver" -ErrorAction SilentlyContinue
+          Start-Sleep -Seconds 3
+          $svc = Get-Service -Name "tvnserver" -ErrorAction SilentlyContinue
+          if ($svc -and $svc.Status -ne "Stopped") {
+            Stop-Process -Name "tvnserver" -Force -ErrorAction SilentlyContinue
+            Start-Sleep -Seconds 2
+          }
+          Start-Process -FilePath "C:\Program Files\TightVNC\tvnserver.exe" -WindowStyle Hidden
+          $ok = $false
+          for ($i = 0; $i -lt 30; $i++) {
+            try { $c = New-Object Net.Sockets.TcpClient; $c.Connect("127.0.0.1", 5900); $c.Close(); $ok = $true; break }
+            catch { Start-Sleep -Seconds 2 }
+          }
+          if (-not $ok) { throw "VNC port 5900 not ready" }
+          Write-Host "VNC server ready"
+          # cloudflared path (used by both tunnels)
+          $cf = "$env:ProgramData\chocolatey\bin\cloudflared.exe"
+          # 2a. Resolution API server (6081) + tunnel, for browser auto-resolution
+          $apiLines = @(
+          'import json, os',
+          'from http.server import BaseHTTPRequestHandler, HTTPServer',
+          'RES_FILE = os.path.join(os.environ["TEMP"], "vnc_requested_res.txt")',
+          'ALLOWED_FILE = os.path.join(os.environ["TEMP"], "allowed_res.txt")',
+          'def load_allowed():',
+          '    try:',
+          '        with open(ALLOWED_FILE) as f:',
+          '            return set(l.strip() for l in f if l.strip())',
+          '    except Exception:',
+          '        return {"1920x1080", "1600x900", "1440x900", "1366x768", "1280x720", "1024x768"}',
+          'ALLOWED = load_allowed()',
+          'class H(BaseHTTPRequestHandler):',
+          '    def _cors(self):',
+          '        self.send_header("Access-Control-Allow-Origin", "*")',
+          '        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")',
+          '        self.send_header("Access-Control-Allow-Headers", "Content-Type")',
+          '    def do_OPTIONS(self):',
+          '        self.send_response(200)',
+          '        self._cors()',
+          '        self.end_headers()',
+          '    def do_POST(self):',
+          '        if self.path == "/api/resolution":',
+          '            try:',
+          '                n = int(self.headers.get("Content-Length", 0))',
+          '                d = json.loads(self.rfile.read(n))',
+          '                r = str(int(d["w"])) + "x" + str(int(d["h"]))',
+          '                code = 200 if r in ALLOWED else 400',
+          '                if code == 200:',
+          '                    open(RES_FILE, "w").write(r)',
+          '            except Exception:',
+          '                code = 400',
+          '            self.send_response(code)',
+          '            self._cors()',
+          '            self.end_headers()',
+          '        else:',
+          '            self.send_response(404)',
+          '            self._cors()',
+          '            self.end_headers()',
+          '    def log_message(self, *a):',
+          '        pass',
+          'HTTPServer(("127.0.0.1", 6081), H).serve_forever()'
+          )
+          $apiLines | Set-Content "$env:TEMP\res_api.py" -Encoding ASCII
+          $apiProc = Start-Process python -ArgumentList @("$env:TEMP\res_api.py") -PassThru -WindowStyle Hidden
+          Start-Sleep -Seconds 3
+          if ($apiProc.HasExited) { throw "resolution API server failed to start" }
+          $cfApiProc = Start-Process $cf -ArgumentList @("tunnel", "--url", "http://127.0.0.1:6081", "--no-autoupdate") -PassThru -WindowStyle Hidden -RedirectStandardOutput "$env:TEMP\tunnel_api.log" -RedirectStandardError "$env:TEMP\tunnel_api.err"
+          Write-Host "Waiting for API tunnel URL..."
+          $apiUrl = ""
+          for ($i = 0; $i -lt 60; $i++) {
+            $m = Select-String -Path "$env:TEMP\tunnel_api.log", "$env:TEMP\tunnel_api.err" -Pattern 'https://[a-zA-Z0-9.-]+\.trycloudflare\.com' -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($m) { $apiUrl = $m.Matches[0].Value; break }
+            if ($cfApiProc.HasExited) { throw "api cloudflared exited early, code $($cfApiProc.ExitCode)" }
+            Start-Sleep -Seconds 2
+          }
+          if (-not $apiUrl) { throw "api tunnel URL not found" }
+          Write-Host "Resolution API ready"
+          # 2b. Inject auto-resolution JS into vnc.html (browser detects viewport, POSTs to API)
+          $vncHtmlPath = "$noVNC\vnc.html"
+          $htmlContent = Get-Content $vncHtmlPath -Raw -Encoding UTF8
+          $pickJs = "function pick(w){"
+          $sortedAllowed = $allowed | ForEach-Object { $a = $_.Split("x"); [pscustomobject]@{W=[int]$a[0]; H=[int]$a[1]} } | Sort-Object W -Descending
+          foreach ($r in $sortedAllowed) { $th = $r.W - 50; $pickJs += "if(w>=$th)return[$($r.W),$($r.H)];" }
+          $lastR = $sortedAllowed[-1]; $pickJs += "return[$($lastR.W),$($lastR.H)];}"
+          Write-Host "JS pick: $pickJs"
+          $autoJs = '<script>(function(){var API="' + $apiUrl + '/api/resolution";var last="";' + $pickJs + 'function send(){var r=pick(window.innerWidth);var s=r[0]+"x"+r[1];if(s===last)return;last=s;fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({w:r[0],h:r[1]})}).catch(function(){});}var t;window.addEventListener("resize",function(){clearTimeout(t);t=setTimeout(send,1000);});setTimeout(send,1500);})();</script>'
+          if ($htmlContent -notmatch [regex]::Escape($apiUrl)) {
+            $htmlContent = $htmlContent.Replace("</body>", $autoJs + "</body>")
+            Set-Content $vncHtmlPath $htmlContent -Encoding UTF8 -NoNewline
+            Write-Host "Auto-resolution JS injected"
+          }
+          # 2c. websockify: bridges noVNC web client (6080) to VNC (5900)
+          $wsArgs = @("-m", "websockify", "--web=$noVNC", "6080", "127.0.0.1:5900")
+          $ws = Start-Process python -ArgumentList $wsArgs -PassThru -WindowStyle Hidden -RedirectStandardOutput "$env:TEMP\websockify.log" -RedirectStandardError "$env:TEMP\websockify.err"
+          Start-Sleep -Seconds 4
+          if ($ws.HasExited) {
+            $wsErr = Get-Content "$env:TEMP\websockify.err" -Raw -ErrorAction SilentlyContinue
+            throw "websockify failed to start: $wsErr"
+          }
+          try {
+            $resp = Invoke-WebRequest -Uri "http://127.0.0.1:6080/vnc.html" -UseBasicParsing -TimeoutSec 10
+            Write-Host "websockify HTTP check: $($resp.StatusCode)"
+          } catch { throw "websockify HTTP check failed: $($_.Exception.Message)" }
+          # 3. cloudflared tunnel (main, for noVNC)
+          $cfProc = Start-Process $cf -ArgumentList @("tunnel", "--url", "http://127.0.0.1:6080", "--no-autoupdate") -PassThru -WindowStyle Hidden -RedirectStandardOutput "$env:TEMP\tunnel.log" -RedirectStandardError "$env:TEMP\tunnel.err"
+          Write-Host "Waiting for tunnel URL..."
+          $tunnelUrl = ""
+          for ($i = 0; $i -lt 60; $i++) {
+            $m = Select-String -Path "$env:TEMP\tunnel.log", "$env:TEMP\tunnel.err" -Pattern 'https://[a-zA-Z0-9.-]+\.trycloudflare\.com' -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($m) { $tunnelUrl = $m.Matches[0].Value; break }
+            if ($cfProc.HasExited) { throw "cloudflared exited early, code $($cfProc.ExitCode)" }
+            Start-Sleep -Seconds 2
+          }
+          if (-not $tunnelUrl) { throw "tunnel URL not found in cloudflared log" }
+          Write-Host ""
+          Write-Host "=================================================="
+          Write-Host "  Open in browser: $tunnelUrl/vnc.html"
+          Write-Host "  Click Connect and enter your VNC password"
+          Write-Host "=================================================="
+          Write-Host ""
+          $mins = [int]"${{ inputs.run_minutes }}"
+          Write-Host "Keeping alive for $mins minutes (Cancel anytime in the Actions page)"
+          $end = (Get-Date).AddMinutes($mins)
+          while ((Get-Date) -lt $end) {
+            Start-Sleep -Seconds 10
+            if ($cfProc.HasExited) { Write-Host "WARNING: cloudflared died, exit code $($cfProc.ExitCode). Tunnel URL no longer works."; break }
+            if ($ws.HasExited) { Write-Host "WARNING: websockify died, exit code $($ws.ExitCode)."; break }
+            if ($cfApiProc.HasExited) { Write-Host "WARNING: api cloudflared died, auto-resolution disabled." }
+            if ($apiProc.HasExited) { Write-Host "WARNING: resolution API died, auto-resolution disabled." }
+            # Auto-resolution: browser JS writes requested size to $resFile
+            if (Test-Path $resFile) {
+              $req = (Get-Content $resFile -Raw).Trim()
+              Remove-Item $resFile -Force -ErrorAction SilentlyContinue
+              if ($req -ne $currentRes -and $req -match '^\d+x\d+$') {
+                $pp = $req.Split("x"); $rw = [int]$pp[0]; $rh = [int]$pp[1]
+                $rr = Set-DesktopRes $rw $rh
+                if ($rr -eq 0) { $currentRes = $req; Write-Host "Auto-resolution: desktop now $req" }
+                else { Write-Host "WARNING: auto-resolution to $req failed (code $rr)" }
+              }
+            }
+          }
