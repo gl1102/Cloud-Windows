@@ -34,6 +34,7 @@ jobs:
       - name: 安装 TightVNC 服务端（含 VNC 密码）
         shell: powershell
         run: |
+          # NOTE: ASCII-only in script blocks, PS 5.1 misdecodes UTF-8 without BOM
           $msi = "$env:TEMP\tightvnc.msi"
           Invoke-WebRequest -Uri "https://www.tightvnc.com/download/2.8.90/tightvnc-2.8.90-gpl-setup-64bit.msi" -OutFile $msi
           $vncPass = "${{ inputs.vnc_password }}"
@@ -47,19 +48,10 @@ jobs:
           if (-not $reg) { throw "VNC password was not set, aborting to avoid passwordless exposure" }
           Write-Host "TightVNC installed, password set"
 
-      - name: 启动 VNC 并准备 noVNC 网页端
+      - name: 准备 noVNC 网页端和 cloudflared
         shell: powershell
         run: |
-          # Start in application mode (captures the current session desktop; avoids session 0 isolation of services)
-          Start-Process -FilePath "C:\Program Files\TightVNC\tvnserver.exe"
-          # Wait for port 5900
-          $ok = $false
-          for ($i = 0; $i -lt 30; $i++) {
-            try { $c = New-Object Net.Sockets.TcpClient; $c.Connect("127.0.0.1", 5900); $c.Close(); $ok = $true; break }
-            catch { Start-Sleep -Seconds 2 }
-          }
-          if (-not $ok) { throw "VNC port 5900 not ready" }
-          Write-Host "VNC server ready"
+          # NOTE: ASCII-only in script blocks, PS 5.1 misdecodes UTF-8 without BOM
           $noVNC = "$env:TEMP\noVNC"
           if (-not (Test-Path "$noVNC\vnc.html")) {
             if (Test-Path $noVNC) { Remove-Item -Recurse -Force $noVNC }
@@ -68,6 +60,26 @@ jobs:
           if (-not (Test-Path "$noVNC\vnc.html")) { throw "noVNC download failed" }
           python -m pip install -q websockify
           if ($LASTEXITCODE -ne 0) { throw "pip install websockify failed" }
+          choco install cloudflared -y --no-progress
+          Write-Host "noVNC files and cloudflared ready"
+
+      - name: 启动服务并建立隧道（在下方日志里找访问地址）
+        shell: powershell
+        run: |
+          # NOTE: ASCII-only in script blocks, PS 5.1 misdecodes UTF-8 without BOM
+          # All long-running services start in THIS step: background processes
+          # started with Start-Process do not reliably survive across steps.
+          $noVNC = "$env:TEMP\noVNC"
+          # 1. TightVNC server in application mode (captures current session desktop)
+          Start-Process -FilePath "C:\Program Files\TightVNC\tvnserver.exe"
+          $ok = $false
+          for ($i = 0; $i -lt 30; $i++) {
+            try { $c = New-Object Net.Sockets.TcpClient; $c.Connect("127.0.0.1", 5900); $c.Close(); $ok = $true; break }
+            catch { Start-Sleep -Seconds 2 }
+          }
+          if (-not $ok) { throw "VNC port 5900 not ready" }
+          Write-Host "VNC server ready"
+          # 2. websockify: bridges noVNC web client (6080) to VNC (5900)
           $wsArgs = @("-m", "websockify", "--web=$noVNC", "6080", "127.0.0.1:5900")
           $ws = Start-Process python -ArgumentList $wsArgs -PassThru -RedirectStandardOutput "$env:TEMP\websockify.log" -RedirectStandardError "$env:TEMP\websockify.err"
           Start-Sleep -Seconds 4
@@ -75,20 +87,11 @@ jobs:
             $wsErr = Get-Content "$env:TEMP\websockify.err" -Raw -ErrorAction SilentlyContinue
             throw "websockify failed to start: $wsErr"
           }
-          # Wait for port 6080 (websockify must be up, otherwise the web page won't load)
-          $wsOk = $false
-          for ($i = 0; $i -lt 15; $i++) {
-            try { $c = New-Object Net.Sockets.TcpClient; $c.Connect("127.0.0.1", 6080); $c.Close(); $wsOk = $true; break }
-            catch { Start-Sleep -Seconds 2 }
-          }
-          if (-not $wsOk) { throw "websockify port 6080 not ready, check the websockify log" }
-          Write-Host "noVNC web client ready"
-
-      - name: 建立公网隧道（在下方日志里找访问地址）
-        shell: powershell
-        run: |
-          # Install cloudflared via choco (preinstalled on the runner)
-          choco install cloudflared -y --no-progress
+          try {
+            $resp = Invoke-WebRequest -Uri "http://127.0.0.1:6080/vnc.html" -UseBasicParsing -TimeoutSec 10
+            Write-Host "websockify HTTP check: $($resp.StatusCode)"
+          } catch { throw "websockify HTTP check failed: $($_.Exception.Message)" }
+          # 3. cloudflared tunnel
           $cf = "$env:ProgramData\chocolatey\bin\cloudflared.exe"
           $cfProc = Start-Process $cf -ArgumentList @("tunnel", "--url", "http://127.0.0.1:6080", "--no-autoupdate") -PassThru -RedirectStandardOutput "$env:TEMP\tunnel.log" -RedirectStandardError "$env:TEMP\tunnel.err"
           Write-Host "Waiting for tunnel URL..."
@@ -96,14 +99,10 @@ jobs:
           for ($i = 0; $i -lt 60; $i++) {
             $m = Select-String -Path "$env:TEMP\tunnel.log", "$env:TEMP\tunnel.err" -Pattern 'https://[a-zA-Z0-9.-]+\.trycloudflare\.com' -ErrorAction SilentlyContinue | Select-Object -First 1
             if ($m) { $tunnelUrl = $m.Matches[0].Value; break }
+            if ($cfProc.HasExited) { throw "cloudflared exited early, code $($cfProc.ExitCode)" }
             Start-Sleep -Seconds 2
           }
-          # Diagnose: is cloudflared alive? does local websockify answer HTTP?
-          if ($cfProc.HasExited) { Write-Host "WARNING: cloudflared already exited, code $($cfProc.ExitCode)" } else { Write-Host "cloudflared running (pid $($cfProc.Id))" }
-          try {
-            $resp = Invoke-WebRequest -Uri "http://127.0.0.1:6080/vnc.html" -UseBasicParsing -TimeoutSec 10
-            Write-Host "Local websockify HTTP check: $($resp.StatusCode)"
-          } catch { Write-Host "WARNING: local websockify HTTP check failed: $($_.Exception.Message)" }
+          if (-not $tunnelUrl) { throw "tunnel URL not found in cloudflared log" }
           Write-Host ""
           Write-Host "=================================================="
           Write-Host "  Open in browser: $tunnelUrl/vnc.html"
@@ -115,7 +114,6 @@ jobs:
           $end = (Get-Date).AddMinutes($mins)
           while ((Get-Date) -lt $end) {
             Start-Sleep -Seconds 60
-            if ($cfProc.HasExited) { Write-Host "WARNING: cloudflared died, exit code $($cfProc.ExitCode). The tunnel URL above no longer works."; break }
-            try { $c = New-Object Net.Sockets.TcpClient; $c.Connect("127.0.0.1", 6080); $c.Close() }
-            catch { Write-Host "WARNING: nothing listening on 6080 anymore (websockify died)."; break }
+            if ($cfProc.HasExited) { Write-Host "WARNING: cloudflared died, exit code $($cfProc.ExitCode). Tunnel URL no longer works."; break }
+            if ($ws.HasExited) { Write-Host "WARNING: websockify died, exit code $($ws.ExitCode)."; break }
           }
