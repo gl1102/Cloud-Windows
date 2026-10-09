@@ -12,7 +12,7 @@ Transforme uma VM Windows gratuita do GitHub Actions em uma área de trabalho na
 - ⌨️ IME Sogou Pinyin integrado, a entrada em chinês funciona de imediato (pressione `Win + Space` para alternar entre chinês e inglês)
 - 🖱️ Conecte-se pelo celular, tablet ou computador
 - ⏱️ Cada execução dura até ~6 horas, e você pode cancelar a qualquer momento
-- 📦 **Edição RustDesk**: há também um workflow do RustDesk que baixa automaticamente a versão mais recente do RustDesk para o disco D e o instala silenciosamente em `D:\RustDesk`
+- 📦 **Edição RustDesk**: há também um workflow do RustDesk que baixa automaticamente o instalador mais recente do RustDesk para a Área de Trabalho
 
 ## 🚀 Uso (funciona logo após fazer fork)
 
@@ -27,7 +27,7 @@ Clique no botão **Fork** no canto superior direito desta página para copiar o 
 1. Acesse a página do seu repositório com fork e clique na aba **Actions** no topo
 2. Escolha um workflow à esquerda (escolha um):
    - **Windows Cloud Desktop**: a área de trabalho na nuvem padrão
-   - **Windows Cloud Desktop + RustDesk**: edição padrão mais download automático do RustDesk mais recente para o disco D com instalação silenciosa em `D:\RustDesk` (a versão não está fixa — sempre busca a última versão oficial)
+   - **Windows Cloud Desktop + RustDesk**: edição padrão mais download automático do instalador mais recente do RustDesk para a Área de Trabalho (a versão não está fixa — sempre busca a última versão oficial); quando precisar de controle remoto, basta clicar duas vezes para instalar
 3. Clique no botão **Run workflow** à direita — uma caixa de diálogo com três campos aparece:
 
 | Parâmetro | Descrição |
