@@ -12,13 +12,13 @@ Gjør en gratis GitHub Actions-Windows-VM om til et skrivebord i skyen du kan br
 - ⌨️ Innebygd Sogou Pinyin-IME, kinesisk inndata fungerer med en gang (trykk `Win + Space` for å bytte mellom kinesisk og engelsk)
 - 🖱️ Koble til fra telefonen, nettbrettet eller datamaskinen
 - ⏱️ Hver kjøring varer opptil ~6 timer, og du kan avbryte når som helst
-- 📦 **RustDesk-utgave**: det finnes også en RustDesk-arbeidsflyt som automatisk laster ned det nyeste RustDesk-installasjonsprogrammet til skrivebordet
+- 📦 **RustDesk-utgave**: det finnes også en RustDesk-arbeidsflyt som automatisk laster ned det nyeste RustDesk-installasjonsprogrammet til skrivebordet (installer selv, eller bruk den portable versjonen for fjernkontroll)
 
 ## 🚀 Bruk (fungerer rett etter forking)
 
 ### Trinn 1: Fork dette prosjektet
 
-Klikk på **Fork**-knappen øverst til høyre på denne siden for å kopiere prosjektet til din egen GitHub-konto. Når du har forket, lander du i depotet `your-username/Cloud-Windows`.
+Klikk på **Fork**-knappen øverst til høyre på denne siden for å kopiere prosjektet til din egen GitHub-konto (forken kopierer `main`-grenen — ikke velg `test`-grenen, den er kun til testing). Når du har forket, lander du i depotet `your-username/Cloud-Windows`.
 
 > 💡 Hvorfor forke? GitHub Actions kan bare kjøre i depoter under din egen konto — forking gir deg tillatelse til å kjøre det.
 
@@ -27,7 +27,7 @@ Klikk på **Fork**-knappen øverst til høyre på denne siden for å kopiere pro
 1. Gå til siden for det forkede depotet og klikk på **Actions**-fanen øverst
 2. Velg en arbeidsflyt til venstre (velg én):
    - **Windows Cloud Desktop**: det vanlige skrivebordet i skyen
-   - **Windows Cloud Desktop + RustDesk**: standardutgaven pluss automatisk nedlasting av det nyeste RustDesk-installasjonsprogrammet til skrivebordet (versjonen er ikke hardkodet — henter alltid den nyeste offisielle utgaven); dobbeltklikk for å installere når du trenger fjernkontroll
+   - **Windows Cloud Desktop + RustDesk**: standardutgaven pluss automatisk nedlasting av det nyeste RustDesk-installasjonsprogrammet (`rustdesk-x.x.x-x86_64.exe`) til skrivebordet (versjonen er ikke hardkodet — henter alltid den nyeste offisielle utgaven); for fjernkontroll med RustDesk: dobbeltklikk for å installere, eller kjør den portable RustDesk-versjonen direkte uten installasjon
 3. Klikk på **Run workflow**-knappen til høyre — en dialog med tre inndatafelt dukker opp:
 
 | Parameter | Beskrivelse |
