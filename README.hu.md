@@ -12,13 +12,13 @@ Alakíts át egy ingyenes GitHub Actions Windows virtuális gépet böngészőb�
 - ⌨️ Beépített Sogou Pinyin beviteli mód, a kínai bevitel azonnal működik (nyomd meg a `Win + Space` billentyűt a kínai és az angol közötti váltáshoz)
 - 🖱️ Csatlakozz telefonról, tabletről vagy számítógépről
 - ⏱️ Minden futás legfeljebb ~6 óráig tart, és bármikor megszakíthatod
-- 📦 **RustDesk kiadás**: van egy RustDesk munkafolyamat is, amely automatikusan letölti a legfrissebb RustDesk telepítőt az Asztalra
+- 📦 **RustDesk kiadás**: van egy RustDesk munkafolyamat is, amely automatikusan letölti a legfrissebb RustDesk telepítőt az Asztalra (távoli vezérléshez telepítsd magad, vagy használd a hordozható verziót)
 
 ## 🚀 Használat (fork után azonnal működik)
 
 ### 1. lépés: Forkold ezt a projektet
 
-Kattints a **Fork** gombra az oldal jobb felső sarkában, hogy a projektet a saját GitHub-fiókodba másold. A fork után a `your-username/Cloud-Windows` tárolóba jutsz.
+Kattints a **Fork** gombra az oldal jobb felső sarkában, hogy a projektet a saját GitHub-fiókodba másold (a fork a `main` ágat másolja – ne a `test` ágat válaszd, az tesztelésre szolgál). A fork után a `your-username/Cloud-Windows` tárolóba jutsz.
 
 > 💡 Miért fork? A GitHub Actions csak a saját fiókod alatti tárolókban futhat — a fork megadja a futtatáshoz szükséges jogosultságot.
 
@@ -27,7 +27,7 @@ Kattints a **Fork** gombra az oldal jobb felső sarkában, hogy a projektet a sa
 1. Menj a forkolt tároló oldalára, és kattints felül az **Actions** fülre
 2. Válassz egy munkafolyamatot bal oldalt (válassz egyet):
    - **Windows Cloud Desktop**: a normál felhő asztal
-   - **Windows Cloud Desktop + RustDesk**: normál kiadás, plusz a legfrissebb RustDesk telepítő automatikus letöltése az Asztalra (a verzió nincs beégetve — mindig a legfrissebb hivatalos kiadást tölti le); távoli vezérléshez csak kattints duplán a telepítéshez
+   - **Windows Cloud Desktop + RustDesk**: normál kiadás, plusz a legfrissebb RustDesk telepítő (`rustdesk-x.x.x-x86_64.exe`) automatikus letöltése az Asztalra (a verzió nincs beégetve — mindig a legfrissebb hivatalos kiadást tölti le); RustDesk távoli vezérléshez kattints duplán a telepítéshez, vagy futtasd telepítés nélkül a hordozható RustDesk verziót
 3. Kattints a jobb oldali **Run workflow** gombra — felugrik egy párbeszédablak három beviteli mezővel:
 
 | Paraméter | Leírás |
