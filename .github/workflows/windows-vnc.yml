@@ -90,7 +90,7 @@ jobs:
             Stop-Process -Name "tvnserver" -Force -ErrorAction SilentlyContinue
             Start-Sleep -Seconds 2
           }
-          Start-Process -FilePath "C:\Program Files\TightVNC\tvnserver.exe"
+          Start-Process -FilePath "C:\Program Files\TightVNC\tvnserver.exe" -WindowStyle Hidden
           $ok = $false
           for ($i = 0; $i -lt 30; $i++) {
             try { $c = New-Object Net.Sockets.TcpClient; $c.Connect("127.0.0.1", 5900); $c.Close(); $ok = $true; break }
@@ -100,7 +100,7 @@ jobs:
           Write-Host "VNC server ready"
           # 2. websockify: bridges noVNC web client (6080) to VNC (5900)
           $wsArgs = @("-m", "websockify", "--web=$noVNC", "6080", "127.0.0.1:5900")
-          $ws = Start-Process python -ArgumentList $wsArgs -PassThru -RedirectStandardOutput "$env:TEMP\websockify.log" -RedirectStandardError "$env:TEMP\websockify.err"
+          $ws = Start-Process python -ArgumentList $wsArgs -PassThru -WindowStyle Hidden -RedirectStandardOutput "$env:TEMP\websockify.log" -RedirectStandardError "$env:TEMP\websockify.err"
           Start-Sleep -Seconds 4
           if ($ws.HasExited) {
             $wsErr = Get-Content "$env:TEMP\websockify.err" -Raw -ErrorAction SilentlyContinue
@@ -112,7 +112,7 @@ jobs:
           } catch { throw "websockify HTTP check failed: $($_.Exception.Message)" }
           # 3. cloudflared tunnel
           $cf = "$env:ProgramData\chocolatey\bin\cloudflared.exe"
-          $cfProc = Start-Process $cf -ArgumentList @("tunnel", "--url", "http://127.0.0.1:6080", "--no-autoupdate") -PassThru -RedirectStandardOutput "$env:TEMP\tunnel.log" -RedirectStandardError "$env:TEMP\tunnel.err"
+          $cfProc = Start-Process $cf -ArgumentList @("tunnel", "--url", "http://127.0.0.1:6080", "--no-autoupdate") -PassThru -WindowStyle Hidden -RedirectStandardOutput "$env:TEMP\tunnel.log" -RedirectStandardError "$env:TEMP\tunnel.err"
           Write-Host "Waiting for tunnel URL..."
           $tunnelUrl = ""
           for ($i = 0; $i -lt 60; $i++) {
