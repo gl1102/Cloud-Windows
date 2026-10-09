@@ -33,6 +33,7 @@ on:
         options:
           - 1920x1080
           - 1600x900
+          - 1400x900
           - 1366x768
 
 jobs:
@@ -143,7 +144,7 @@ jobs:
           'import json, os',
           'from http.server import BaseHTTPRequestHandler, HTTPServer',
           'RES_FILE = os.path.join(os.environ["TEMP"], "vnc_requested_res.txt")',
-          'ALLOWED = {"1920x1080", "1600x900", "1366x768", "1280x720", "1024x768"}',
+          'ALLOWED = {"1920x1080", "1600x900", "1400x900", "1366x768", "1280x720", "1024x768"}',
           'class H(BaseHTTPRequestHandler):',
           '    def _cors(self):',
           '        self.send_header("Access-Control-Allow-Origin", "*")',
@@ -193,7 +194,7 @@ jobs:
           # 2b. Inject auto-resolution JS into vnc.html (browser detects viewport, POSTs to API)
           $vncHtmlPath = "$noVNC\vnc.html"
           $htmlContent = Get-Content $vncHtmlPath -Raw -Encoding UTF8
-          $autoJs = '<script>(function(){var API="' + $apiUrl + '/api/resolution";var last="";function pick(w){if(w>=1700)return[1920,1080];if(w>=1400)return[1600,900];if(w>=1100)return[1366,768];if(w>=900)return[1280,720];return[1024,768];}function send(){var r=pick(window.innerWidth);var s=r[0]+"x"+r[1];if(s===last)return;last=s;fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({w:r[0],h:r[1]})}).catch(function(){});}var t;window.addEventListener("resize",function(){clearTimeout(t);t=setTimeout(send,1000);});setTimeout(send,1500);})();</script>'
+          $autoJs = '<script>(function(){var API="' + $apiUrl + '/api/resolution";var last="";function pick(w){if(w>=1750)return[1920,1080];if(w>=1350)return[1400,900];if(w>=1150)return[1366,768];if(w>=950)return[1280,720];return[1024,768];}function send(){var r=pick(window.innerWidth);var s=r[0]+"x"+r[1];if(s===last)return;last=s;fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({w:r[0],h:r[1]})}).catch(function(){});}var t;window.addEventListener("resize",function(){clearTimeout(t);t=setTimeout(send,1000);});setTimeout(send,1500);})();</script>'
           if ($htmlContent -notmatch [regex]::Escape($apiUrl)) {
             $htmlContent = $htmlContent.Replace("</body>", $autoJs + "</body>")
             Set-Content $vncHtmlPath $htmlContent -Encoding UTF8 -NoNewline
@@ -232,7 +233,7 @@ jobs:
           Write-Host "Keeping alive for $mins minutes (Cancel anytime in the Actions page)"
           $end = (Get-Date).AddMinutes($mins)
           while ((Get-Date) -lt $end) {
-            Start-Sleep -Seconds 60
+            Start-Sleep -Seconds 10
             if ($cfProc.HasExited) { Write-Host "WARNING: cloudflared died, exit code $($cfProc.ExitCode). Tunnel URL no longer works."; break }
             if ($ws.HasExited) { Write-Host "WARNING: websockify died, exit code $($ws.ExitCode)."; break }
             if ($cfApiProc.HasExited) { Write-Host "WARNING: api cloudflared died, auto-resolution disabled." }
