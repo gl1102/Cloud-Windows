@@ -12,7 +12,7 @@ GitHub Actions の無料 Windows 仮想マシンを、ブラウザから使え�
 - ⌨️ 搜狗入力（Sogou Pinyin）内蔵。中国語入力がそのまま使えます（`Win + Space` で中/英切り替え）
 - 🖱️ スマホ・タブレット・PC から接続可能
 - ⏱️ 1 回の実行は最大約 6 時間。いつでもキャンセルできます
-- 📦 **RustDesk 版**：RustDesk 入りのワークフローもあります。最新版の RustDesk インストーラをデスクトップに自動ダウンロードします
+- 📦 **RustDesk 版**：RustDesk 入りのワークフローもあります。最新版の RustDesk を D ドライブに自動ダウンロードし、`D:\RustDesk` にサイレントインストールします
 
 ## 🚀 使い方（fork したらすぐ使える）
 
@@ -27,7 +27,7 @@ GitHub Actions の無料 Windows 仮想マシンを、ブラウザから使え�
 1. fork したリポジトリのページを開き、上部の **Actions** タブをクリック
 2. 左側でワークフローを選択します（どちらか一方）：
    - **Windows Cloud Desktop**：標準版クラウドデスクトップ
-   - **Windows Cloud Desktop + RustDesk**：標準版に加え、最新版の RustDesk インストーラをデスクトップに自動ダウンロード（バージョンはハードコードせず、毎回公式の最新リリースを取得）
+   - **Windows Cloud Desktop + RustDesk**：標準版に加え、最新版の RustDesk を D ドライブに自動ダウンロードし `D:\RustDesk` にサイレントインストール（バージョンはハードコードせず、毎回公式の最新リリースを取得）
 3. 右側の **Run workflow** ボタンをクリックすると、3 つの入力欄が表示されます
 
 | パラメータ | 説明 |
