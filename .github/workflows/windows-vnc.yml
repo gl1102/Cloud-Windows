@@ -64,7 +64,13 @@ jobs:
           python -m pip install -q websockify
           $wsArgs = @("-m", "websockify", "--web=$env:TEMP\noVNC", "6080", "127.0.0.1:5900")
           Start-Process python -ArgumentList $wsArgs -RedirectStandardOutput "$env:TEMP\websockify.log" -RedirectStandardError "$env:TEMP\websockify.err"
-          Start-Sleep -Seconds 3
+          # Wait for port 6080 (websockify must be up, otherwise the web page won't load)
+          $wsOk = $false
+          for ($i = 0; $i -lt 15; $i++) {
+            try { $c = New-Object Net.Sockets.TcpClient; $c.Connect("127.0.0.1", 6080); $c.Close(); $wsOk = $true; break }
+            catch { Start-Sleep -Seconds 2 }
+          }
+          if (-not $wsOk) { throw "websockify port 6080 not ready, check the websockify log" }
           Write-Host "noVNC web client ready"
 
       - name: 建立公网隧道（在下方日志里找访问地址）
