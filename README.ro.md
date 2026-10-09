@@ -12,7 +12,7 @@ Transformă o mașină virtuală Windows gratuită din GitHub Actions într-un d
 - ⌨️ IME Sogou Pinyin integrat, introducerea textului chinezesc funcționează din prima (apasă `Win + Space` pentru a comuta între chineză și engleză)
 - 🖱️ Conectează-te de pe telefon, tabletă sau computer
 - ⏱️ Fiecare rulare durează până la ~6 ore și o poți anula oricând
-- 📦 **Ediția RustDesk**: există și un workflow RustDesk care descarcă automat cea mai recentă versiune RustDesk pe unitatea D și o instalează silențios în `D:\RustDesk`
+- 📦 **Ediția RustDesk**: există și un workflow RustDesk care descarcă automat cel mai recent instalator RustDesk pe Desktop
 
 ## 🚀 Utilizare (funcționează imediat după fork)
 
@@ -27,7 +27,7 @@ Apasă butonul **Fork** din colțul din dreapta sus al acestei pagini pentru a c
 1. Mergi la pagina depozitului tău cu fork și apasă fila **Actions** din partea de sus
 2. Alege un workflow din stânga (alege unul):
    - **Windows Cloud Desktop**: desktopul standard în cloud
-   - **Windows Cloud Desktop + RustDesk**: ediția standard plus descărcarea automată a celei mai recente versiuni RustDesk pe unitatea D cu instalare silențioasă în `D:\RustDesk` (versiunea nu este fixată — preia întotdeauna ultima versiune oficială)
+   - **Windows Cloud Desktop + RustDesk**: ediția standard plus descărcarea automată a celui mai recent instalator RustDesk pe Desktop (versiunea nu este fixată — preia întotdeauna ultima versiune oficială); când ai nevoie de control la distanță, dă dublu-clic pentru instalare
 3. Apasă butonul **Run workflow** din dreapta — apare o fereastră de dialog cu trei câmpuri de intrare:
 
 | Parametru | Descriere |
