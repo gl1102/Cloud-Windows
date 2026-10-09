@@ -12,7 +12,7 @@ Biến máy ảo Windows miễn phí của GitHub Actions thành một máy tín
 - ⌨️ Bộ gõ Sogou Pinyin tích hợp sẵn, nhập tiếng Trung hoạt động ngay (nhấn `Win + Space` để chuyển giữa tiếng Trung và tiếng Anh)
 - 🖱️ Kết nối từ điện thoại, máy tính bảng hoặc máy tính
 - ⏱️ Mỗi lần chạy kéo dài tới ~6 giờ, và bạn có thể hủy bất cứ lúc nào
-- 📦 **Phiên bản RustDesk**: còn có một workflow RustDesk tự động tải bản RustDesk mới nhất về ổ D và cài đặt im lặng vào `D:\RustDesk`
+- 📦 **Phiên bản RustDesk**: còn có một workflow RustDesk tự động tải file cài đặt RustDesk mới nhất về màn hình nền (Desktop)
 
 ## 🚀 Cách dùng (dùng được ngay sau khi fork)
 
@@ -27,7 +27,7 @@ Nhấn nút **Fork** ở góc trên bên phải trang này để sao chép dự 
 1. Vào trang kho đã fork của bạn và nhấn tab **Actions** ở trên cùng
 2. Chọn một workflow ở bên trái (chọn một):
    - **Windows Cloud Desktop**: máy tính đám mây tiêu chuẩn
-   - **Windows Cloud Desktop + RustDesk**: bản tiêu chuẩn cộng thêm tự động tải bản RustDesk mới nhất về ổ D và cài đặt im lặng vào `D:\RustDesk` (phiên bản không bị cố định — luôn lấy bản phát hành chính thức mới nhất)
+   - **Windows Cloud Desktop + RustDesk**: bản tiêu chuẩn cộng thêm tự động tải file cài đặt RustDesk mới nhất về màn hình nền (Desktop) (phiên bản không bị cố định — luôn lấy bản phát hành chính thức mới nhất); khi cần điều khiển từ xa, chỉ cần nhấp đúp để cài đặt
 3. Nhấn nút **Run workflow** ở bên phải — một hộp thoại với ba ô nhập hiện ra:
 
 | Tham số | Mô tả |
