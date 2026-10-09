@@ -1,3 +1,5 @@
+[简体中文](README.md) | [English](README.en.md) | [Русский](README.ru.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md)
+
 # ☁️ Cloud-Windows — 免费云 Windows 桌面
 
 用 GitHub Actions 的免费 Windows 虚拟机，打造一个可以通过浏览器远程访问的云桌面。打开网页就能用一台 Windows 电脑，不用时关掉就行，全程免费。
