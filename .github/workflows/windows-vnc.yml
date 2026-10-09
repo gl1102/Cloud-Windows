@@ -46,7 +46,9 @@ jobs:
           # Verify the password was actually written; abort instead of exposing a passwordless desktop
           $reg = Get-ItemProperty -Path "HKLM:\SOFTWARE\TightVNC\Server" -Name "Password" -ErrorAction SilentlyContinue
           if (-not $reg) { throw "VNC password was not set, aborting to avoid passwordless exposure" }
-          Write-Host "TightVNC installed, password set"
+          # Allow loopback connections (websockify connects via 127.0.0.1)
+          Set-ItemProperty -Path "HKLM:\SOFTWARE\TightVNC\Server" -Name "AllowLoopback" -Value 1 -Type DWord
+          Write-Host "TightVNC installed, password set, loopback allowed"
 
       - name: 准备 noVNC 网页端和 cloudflared
         shell: powershell
