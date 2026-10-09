@@ -51,6 +51,11 @@ jobs:
           $hkcuTvn = "HKCU:\SOFTWARE\TightVNC\Server"
           if (-not (Test-Path $hkcuTvn)) { New-Item -Path $hkcuTvn -Force | Out-Null }
           Set-ItemProperty -Path $hkcuTvn -Name "AllowLoopback" -Value 1 -Type DWord
+          # Application mode reads HKCU, not HKLM: copy auth config over (binary-safe via .NET)
+          $pwBytes = [Microsoft.Win32.Registry]::GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\TightVNC\Server", "Password", $null)
+          if ($pwBytes) { [Microsoft.Win32.Registry]::SetValue("HKEY_CURRENT_USER\SOFTWARE\TightVNC\Server", "Password", $pwBytes, [Microsoft.Win32.RegistryValueKind]::Binary) }
+          $useAuth = [Microsoft.Win32.Registry]::GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\TightVNC\Server", "UseVncAuthentication", $null)
+          if ($null -ne $useAuth) { [Microsoft.Win32.Registry]::SetValue("HKEY_CURRENT_USER\SOFTWARE\TightVNC\Server", "UseVncAuthentication", $useAuth, [Microsoft.Win32.RegistryValueKind]::DWord) }
           Write-Host "TightVNC installed, password set, loopback allowed"
 
       - name: 准备 noVNC 网页端和 cloudflared
