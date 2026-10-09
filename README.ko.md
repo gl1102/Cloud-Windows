@@ -12,7 +12,7 @@ GitHub Actions의 무료 Windows 가상 머신을 브라우저로 접속하는 �
 - ⌨️ Sogou 입력기(搜狗输入法) 내장, 중국어 입력이 바로 됩니다(`Win + Space`로 중/영 전환)
 - 🖱️ 휴대폰·태블릿·PC 어디서든 접속 가능
 - ⏱️ 1회 최대 약 6시간 실행, 언제든 취소 가능
-- 📦 **RustDesk 버전**: RustDesk가 포함된 워크플로도 있으며, 최신 RustDesk를 D 드라이브에 자동 다운로드하고 `D:\RustDesk`에 무인 설치합니다
+- 📦 **RustDesk 버전**: RustDesk가 포함된 워크플로도 있으며, 최신 RustDesk 설치 프로그램을 Desktop에 자동 다운로드합니다
 
 ## 🚀 사용 방법(Fork 후 바로 사용)
 
@@ -27,7 +27,7 @@ GitHub Actions의 무료 Windows 가상 머신을 브라우저로 접속하는 �
 1. Fork한 저장소 페이지에서 상단 **Actions** 탭 클릭
 2. 왼쪽에서 워크플로를 선택하세요(둘 중 하나):
    - **Windows Cloud Desktop**: 표준 클라우드 데스크톱
-   - **Windows Cloud Desktop + RustDesk**: 표준 버전에 최신 RustDesk를 D 드라이브에 자동 다운로드하고 `D:\RustDesk`에 무인 설치(버전 하드코딩 없음, 매번 공식 최신 릴리스를 가져옴)
+  - **Windows Cloud Desktop + RustDesk**: 표준 버전에 최신 RustDesk 설치 프로그램을 Desktop에 자동 다운로드(버전 하드코딩 없음, 매번 공식 최신 릴리스를 가져옴); 원격 제어가 필요할 때 더블클릭하면 설치됩니다
 3. 오른쪽 **Run workflow** 버튼을 누르면 입력창 3개가 뜹니다
 
 | 매개변수 | 설명 |
